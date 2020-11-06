@@ -1,6 +1,4 @@
-torch
 numpy
-opencv-python
 tqdm
 matplotlib
 scipy

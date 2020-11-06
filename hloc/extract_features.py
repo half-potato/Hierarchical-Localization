@@ -49,6 +49,35 @@ confs = {
             'resize_force': True,
         },
     },
+
+    'cpainted_aachen': {
+        'output': 'feats-cpainted-n4096-r1024',
+        'model': {
+            'name': 'cpainted',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+            'resize_force': True,
+        },
+    },
+
+    'cpainted_inloc': {
+        'output': 'feats-cpainted-n4096-r1024',
+        'model': {
+            'name': 'cpainted',
+            'nms_radius': 4,
+            'max_keypoints': 4096,
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+            'resize_force': True,
+        },
+    },
+
     'superpoint_inloc': {
         'output': 'feats-superpoint-n4096-r1600',
         'model': {
