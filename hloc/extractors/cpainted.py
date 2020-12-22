@@ -327,3 +327,4 @@ def sample_descriptors(descriptor, H, W, pts, padding=[0,0,0,0], normalize=True)
     if normalize:
         descs = F.normalize(descs, p=2, dim=1)
     return descs.view(N, -1, M).transpose(1, 2)
+
