@@ -4,6 +4,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from ..utils.base_model import BaseModel
+import numpy as np
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent / '../../third_party'))
@@ -136,14 +137,15 @@ class SuperPointTrainable(SuperPointNet):
 
 class CPainted(BaseModel):
     default_config = {
-        "threshold": 0.01,
+        "threshold": 0.03,
         "maxpool_radius": 3,
         "remove_borders": 4,
+        "max_keypoints": 2048,
         #  "checkpoint": "/app/outputs/checkpoints/no_forest_low_thres/models/checkpoint001.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run_9_24/models/checkpoint003.pth",
-        "checkpoint": "/app/outputs/checkpoints/run-8-20-unreal-blended_05/models/checkpoint005.pth",
-        "checkpoint": "/app/outputs/checkpoints/run-10-23-unreal-blended_10/models/checkpoint002.pth",
-
+        #  "checkpoint": "/app/outputs/checkpoints/run-8-20-unreal-blended_05/models/checkpoint005.pth",
+        #  "checkpoint": "/app/outputs/checkpoints/run-10-23-unreal-blended_10/models/checkpoint002.pth",
+        "checkpoint": "/app/outputs/checkpoints/run-11-10-unreal-blended_08/models/checkpoint005.pth",
     }
     def _init(self, config):
         self.config = {**self.default_config, **config}
@@ -173,9 +175,9 @@ class CPainted(BaseModel):
         # Shape: (3, N)
         mask1 = mask_border(heatmap, border=self.config["remove_borders"])
 #         mask2 = mask_max(heatmap, radius=self.config["maxpool_radius"])
-        
+
 #         heatmap = score_gaussian_peaks(heatmap)
-        mask2 = mask_max(heatmap, radius=2)
+        mask2 = mask_max(heatmap, radius=self.config["maxpool_radius"])
 
         pooled = mask1 * mask2 * heatmap
 
@@ -188,6 +190,10 @@ class CPainted(BaseModel):
         sampled = []
         for i in range(B):
             y, x = torch.where(pooled[i].squeeze() > self.config["threshold"])
+            if len(y) > self.config["max_keypoints"]:
+                threshold, _ = torch.sort(pooled[i].flatten(), descending=True)
+                threshold = threshold[self.config["max_keypoints"]]
+                y, x = torch.where(pooled[i].squeeze() > threshold)
             l_pts = torch.stack((y, x), dim=1)
             l_scores = heatmap[i].squeeze()[l_pts[:, 0], l_pts[:, 1]]
             flipped = torch.flip(l_pts, [1]).float()
@@ -199,7 +205,7 @@ class CPainted(BaseModel):
             pts.append(flipped)
             scores.append(l_scores)
             sampled.append(l_sampled)
-        print(pts[0].shape)
+        #  print(pts[0].shape)
 #         print(scores.shape)
 #         print(sampled.shape)
 #         torch.Size([2039, 2])
@@ -321,3 +327,4 @@ def sample_descriptors(descriptor, H, W, pts, padding=[0,0,0,0], normalize=True)
     if normalize:
         descs = F.normalize(descs, p=2, dim=1)
     return descs.view(N, -1, M).transpose(1, 2)
+
