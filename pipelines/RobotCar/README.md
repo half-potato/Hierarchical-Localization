@@ -16,17 +16,15 @@ python -m hloc.pairs_from_covisibility \
     --output pairs/pairs-db-covis20.txt \
     --num_matched 20
 
-python -m hloc.extract_features --image_dir $ROBOTCAR/images/ --export_dir outputs/
-
-python -m hloc.match_features --pairs pairs/pairs-db-covis20.txt --export_dir outputs/
-
-python -m hloc.triangulation \
-    --sfm_dir outputs/sfm_superpoint+superglue \
-    --reference_sfm_model outputs/sfm_sift \
+python3 -m hloc.extract_features --image_dir $ROBOTCAR/images/ --export_dir outputs/robotcar/ --conf cpainted_aachen && \
+python3 -m hloc.match_features --pairs pairs/pairs-db-covis20.txt --export_dir outputs/robotcar/ --features feats-cpainted-n4096-r1024 && \
+python3 -m hloc.triangulation \
+    --sfm_dir outputs/robotcar/sfm_cpainted+superglue \
+    --reference_sfm_model outputs/robotcar/sfm_sift \
     --image_dir $ROBOTCAR/images/ \
     --pairs pairs/pairs-db-covis20.txt \
-    --features outputs/feats-superpoint-n4096-r1024.h5 \
-    --matches outputs/feats-superpoint-n4096-r1024_matches-superglue_pairs-db-covis20.h5
+    --features outputs/robotcar/feats-cpainted-n4096-r1024.h5 \
+    --matches outputs/robotcar/feats-cpainted-n4096-r1024_matches-superglue_pairs-db-covis20.h5
 
 python -m hloc.match_features \
     --pairs pairs/pairs-query-netvlad20-percam-perloc.txt \
