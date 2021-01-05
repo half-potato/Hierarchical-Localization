@@ -197,6 +197,8 @@ def main(reference_sfm, queries, retrieval, features, matches, results,
         pickle.dump(logs, f)
     logging.info('Done!')
 
+    return logs_path
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

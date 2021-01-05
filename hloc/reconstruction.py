@@ -148,6 +148,7 @@ def main(sfm_dir, image_dir, pairs, features, matches,
         colmap_path, models, database, image_dir, min_num_matches)
     stats['num_input_images'] = len(image_ids)
     logging.info(f'Statistics:\n{pprint.pformat(stats)}')
+    return stats
 
 
 if __name__ == '__main__':

@@ -192,6 +192,7 @@ def main(sfm_dir, reference_sfm_model, image_dir, pairs, features, matches,
 
     logging.info(f'Statistics:\n{pprint.pformat(stats)}')
     shutil.rmtree(empty_model)
+    return stats
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 import sys
+
 from pathlib import Path
 import subprocess
 import logging
@@ -10,6 +11,66 @@ d2net_path = Path(__file__).parent / '../../third_party/d2net'
 sys.path.append(str(d2net_path))
 from lib.model_test import D2Net as _D2Net
 from lib.pyramid import process_multiscale
+
+# To implement multiscale description
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from lib.exceptions import EmptyTensorError
+from lib.utils import interpolate_dense_features, upscale_positions
+
+
+def describe_multiscale(image, model, keypoints, scales=[.5, 1, 2]):
+    b, _, h_init, w_init = image.size()
+    device = image.device
+    assert(b == 1)
+
+    previous_dense_features = None
+    banned = None
+    for idx, scale in enumerate(scales):
+        current_image = F.interpolate(
+            image, scale_factor=scale,
+            mode='bilinear', align_corners=True
+        )
+        _, _, h_level, w_level = current_image.size()
+
+        dense_features = model.dense_feature_extraction(current_image)
+        del current_image
+
+        _, _, h, w = dense_features.size()
+
+        # Sum the feature maps.
+        if previous_dense_features is not None:
+            dense_features += F.interpolate(
+                previous_dense_features, size=[h, w],
+                mode='bilinear', align_corners=True
+            )
+            del previous_dense_features
+
+        previous_dense_features = dense_features
+        del dense_features
+
+
+    all_descriptors = torch.zeros([
+        model.dense_feature_extraction.num_channels, 0
+    ])
+    try:
+        raw_descriptors, _, ids = interpolate_dense_features(
+            keypoints.to(device),
+            dense_features[0]
+        )
+    except EmptyTensorError:
+        raw_descriptors = all_descriptors
+
+    descriptors = F.normalize(raw_descriptors, dim=0).cpu()
+    del raw_descriptors
+
+    all_descriptors = torch.cat([all_descriptors, descriptors], dim=1)
+    descriptors = all_descriptors.t().numpy()
+    del all_descriptors
+
+    return descriptors
 
 
 class D2Net(BaseModel):

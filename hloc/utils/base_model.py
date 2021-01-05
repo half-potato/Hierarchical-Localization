@@ -31,6 +31,10 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
         """To be implemented by the child class."""
         raise NotImplementedError
 
+    def _describe(self, data, output):
+        """To be implemented by the child class."""
+        raise NotImplementedError
+
 
 def dynamic_load(root, model):
     module_path = f'{root.__name__}.{model}'

@@ -50,6 +50,20 @@ confs = {
         },
     },
 
+    'cpainted': {
+        'output': 'feats-cpainted-n4096-r1024',
+        'model': {
+            'name': 'cpainted',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+        },
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+            'resize_force': True,
+        },
+    },
+
     'cpainted_aachen': {
         'output': 'feats-cpainted-n4096-r1024',
         'model': {
@@ -164,13 +178,14 @@ class ImageDataset(torch.utils.data.Dataset):
 
 
 @torch.no_grad()
-def main(conf, image_dir, export_dir, as_half=False):
+def main(conf, image_dir, export_dir, as_half=False, model=None):
     logging.info('Extracting local features with configuration:'
                  f'\n{pprint.pformat(conf)}')
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    Model = dynamic_load(extractors, conf['model']['name'])
-    model = Model(conf['model']).eval().to(device)
+    if model is None:
+        Model = dynamic_load(extractors, conf['model']['name'])
+        model = Model(conf['model']).eval().to(device)
 
     loader = ImageDataset(image_dir, conf['preprocessing'])
     loader = torch.utils.data.DataLoader(loader, num_workers=1)

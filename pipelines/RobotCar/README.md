@@ -13,8 +13,12 @@ python robotcar_to_colmap.py \
     
 python -m hloc.pairs_from_covisibility \
     --model outputs/sfm_sift \
-    --output pairs/pairs-db-covis20.txt \
+    --output pairs/robotcar-pairs-db-covis20.txt \
     --num_matched 20
+    
+python robotcar_generate_query_list.py \
+    --dataset $ROBOTCAR \
+    --outputs outputs/robotcar
 
 python3 -m hloc.extract_features --image_dir $ROBOTCAR/images/ --export_dir outputs/robotcar/ --conf cpainted_aachen && \
 python3 -m hloc.match_features --pairs pairs/pairs-db-covis20.txt --export_dir outputs/robotcar/ --features feats-cpainted-n4096-r1024 && \
@@ -29,10 +33,6 @@ python3 -m hloc.triangulation \
 python -m hloc.match_features \
     --pairs pairs/pairs-query-netvlad20-percam-perloc.txt \
     --export_dir outputs/
-    
-python robotcar_generate_query_list.py \
-    --dataset $ROBOTCAR \
-    --outputs outputs/
     
 python localize.py \
     --reference_sfm outputs/sfm_superpoint+superglue/model \

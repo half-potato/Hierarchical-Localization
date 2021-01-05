@@ -194,6 +194,7 @@ def main(reference_sfm, queries, retrieval, features, matches, results,
     with open(logs_path, 'wb') as f:
         pickle.dump(logs, f)
     logging.info('Done!')
+    return logs_path
 
 
 if __name__ == '__main__':

@@ -15,62 +15,67 @@ relocalization_files = {
     'test1': 'RelocalizationFilesTest/relocalizationFile_recording_2020-04-23_19-37-00_*.txt',
 }
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--sequence', type=str, required=True,
-                    choices=['training', 'validation', 'test0', 'test1'],
-                    help='Sequence to be relocalized.')
-parser.add_argument('--dataset', type=Path, default='datasets/4Seasons',
-                    help='Path to the dataset, default: %(default)s')
-parser.add_argument('--outputs', type=Path, default='outputs/4Seasons',
-                    help='Path to the output directory, default: %(default)s')
-args = parser.parse_args()
-sequence = args.sequence
+def main():
 
-data_dir = args.dataset
-ref_dir = data_dir / 'reference'
-assert ref_dir.exists(), f'{ref_dir} does not exist'
-seq_dir = data_dir / sequence
-assert seq_dir.exists(), f'{seq_dir} does not exist'
-seq_images = seq_dir / 'undistorted_images'
-reloc = ref_dir / relocalization_files[sequence]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--sequence', type=str, required=True,
+                        choices=['training', 'validation', 'test0', 'test1'],
+                        help='Sequence to be relocalized.')
+    parser.add_argument('--dataset', type=Path, default='datasets/4Seasons',
+                        help='Path to the dataset, default: %(default)s')
+    parser.add_argument('--outputs', type=Path, default='outputs/4Seasons',
+                        help='Path to the output directory, default: %(default)s')
+    args = parser.parse_args()
+    sequence = args.sequence
 
-output_dir = args.outputs
-output_dir.mkdir(exist_ok=True, parents=True)
-query_list = output_dir / f'{sequence}_queries_with_intrinsics.txt'
-ref_pairs = output_dir / 'pairs-db-dist20.txt'
-ref_sfm = output_dir / 'sfm_superpoint+superglue'
-results_path = output_dir / f'localization_{sequence}_hloc+superglue.txt'
-submission_dir = output_dir / 'submission_hloc+superglue'
+    data_dir = args.dataset
+    ref_dir = data_dir / 'reference'
+    assert ref_dir.exists(), f'{ref_dir} does not exist'
+    seq_dir = data_dir / sequence
+    assert seq_dir.exists(), f'{seq_dir} does not exist'
+    seq_images = seq_dir / 'undistorted_images'
+    reloc = ref_dir / relocalization_files[sequence]
 
-num_loc_pairs = 10
-loc_pairs = output_dir / f'pairs-query-{sequence}-dist{num_loc_pairs}.txt'
+    output_dir = args.outputs
+    output_dir.mkdir(exist_ok=True, parents=True)
+    query_list = output_dir / f'{sequence}_queries_with_intrinsics.txt'
+    ref_pairs = output_dir / 'pairs-db-dist20.txt'
+    ref_sfm = output_dir / 'sfm_superpoint+superglue'
+    results_path = output_dir / f'localization_{sequence}_hloc+superglue.txt'
+    submission_dir = output_dir / 'submission_hloc+superglue'
 
-fconf = extract_features.confs['superpoint_max']
-mconf = match_features.confs['superglue']
+    num_loc_pairs = 10
+    loc_pairs = output_dir / f'pairs-query-{sequence}-dist{num_loc_pairs}.txt'
 
-# Not all query images that are used for the evaluation
-# To save time in feature extraction, we delete unsused images.
-timestamps = get_timestamps(reloc, 1)
-delete_unused_images(seq_images, timestamps)
+    fconf = extract_features.confs['superpoint_max']
+    mconf = match_features.confs['superglue']
 
-# Generate a list of query images with their intrinsics.
-generate_query_lists(timestamps, seq_dir, query_list)
+    # Not all query images that are used for the evaluation
+    # To save time in feature extraction, we delete unsused images.
+    timestamps = get_timestamps(reloc, 1)
+    delete_unused_images(seq_images, timestamps)
 
-# Generate the localization pairs from the given reference frames.
-generate_localization_pairs(
-    sequence, reloc, num_loc_pairs, ref_pairs, loc_pairs)
+    # Generate a list of query images with their intrinsics.
+    generate_query_lists(timestamps, seq_dir, query_list)
 
-# Extract, match, amd localize.
-ffile = extract_features.main(fconf, seq_images, output_dir)
-mfile = match_features.main(mconf, loc_pairs, fconf['output'], output_dir)
-localize_sfm.main(
-    ref_sfm / 'model', query_list, loc_pairs, ffile, mfile, results_path)
+    # Generate the localization pairs from the given reference frames.
+    generate_localization_pairs(
+        sequence, reloc, num_loc_pairs, ref_pairs, loc_pairs)
 
-# Convert the absolute poses to relative poses with the reference frames.
-submission_dir.mkdir(exist_ok=True)
-prepare_submission(results_path, reloc, ref_dir / 'poses.txt', submission_dir)
+    # Extract, match, amd localize.
+    ffile = extract_features.main(fconf, seq_images, output_dir)
+    mfile = match_features.main(mconf, loc_pairs, fconf['output'], output_dir)
+    localize_sfm.main(
+        ref_sfm / 'model', query_list, loc_pairs, ffile, mfile, results_path)
 
-# If not a test sequence: evaluation the localization accuracy
-if 'test' not in sequence:
-    logging.info('Evaluating the relocalization submission...')
-    evaluate_submission(submission_dir, reloc)
+    # Convert the absolute poses to relative poses with the reference frames.
+    submission_dir.mkdir(exist_ok=True)
+    prepare_submission(results_path, reloc, ref_dir / 'poses.txt', submission_dir)
+
+    # If not a test sequence: evaluation the localization accuracy
+    if 'test' not in sequence:
+        logging.info('Evaluating the relocalization submission...')
+        evaluate_submission(submission_dir, reloc)
+
+if __name__ == "__main__":
+    main()
