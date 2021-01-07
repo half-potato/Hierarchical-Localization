@@ -181,9 +181,6 @@ class CPainted(BaseModel):
 
         pooled = mask1 * mask2 * heatmap
 
-        # Compute descriptor
-        _, descriptors = self.desc_net._forward(data)
-
         # torch where over batch
         pts = []
         scores = []
@@ -198,19 +195,13 @@ class CPainted(BaseModel):
             l_scores = heatmap[i].squeeze()[l_pts[:, 0], l_pts[:, 1]]
             flipped = torch.flip(l_pts, [1]).float()
 
-            #  l_sampled = sample_descriptors(
-            #          desc[i].unsqueeze(0), H, W, l_pts.view(1, -1, 2), padding).squeeze(0).T
-            l_sampled = SP.sample_descriptors(flipped.view(1, -1, 2), descriptors[i][None], 8)[0]
+            l_sampled = sample_descriptors(
+                    desc[i].unsqueeze(0), H, W, l_pts.view(1, -1, 2), padding).squeeze(0).T
+            #  l_sampled = SP.sample_descriptors(flipped.view(1, -1, 2), descriptors[i][None], 8)[0]
 
-            pts.append(flipped)
-            scores.append(l_scores)
-            sampled.append(l_sampled)
-        #  print(pts[0].shape)
-#         print(scores.shape)
-#         print(sampled.shape)
-#         torch.Size([2039, 2])
-#         torch.Size([2039])
-#         torch.Size([2039, 256])
+            pts.append(flipped) # (N, 2)
+            scores.append(l_scores) # (N)
+            sampled.append(l_sampled) # (N, 256)
 
         return {
             'keypoints': pts,

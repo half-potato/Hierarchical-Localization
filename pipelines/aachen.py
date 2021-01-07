@@ -4,12 +4,12 @@
 from pathlib import Path
 from pprint import pformat
 
-from hloc import extract_features, match_features, 
+from hloc import extract_features, match_features
 from hloc import triangulation, localize_sfm, visualization
 
 # # Pipeline for outdoor day-night visual localization
 
-def run_test(base_dir, feature_conf, matcher_conf, run_name, run_localization=False):
+def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False):
     # ## Setup
     # Here we declare the paths to the dataset, the reconstruction and
     # localization outputs, and we choose the feature extractor and the
@@ -25,7 +25,7 @@ def run_test(base_dir, feature_conf, matcher_conf, run_name, run_localization=Fa
     sfm_pairs = pairs / 'pairs-db-covis20.txt'  # top 20 most covisible in SIFT model
     loc_pairs = pairs / 'pairs-query-netvlad50.txt'  # top 50 retrieved by NetVLAD
 
-    run_dir = Path(f'outputs/aachen/{run_name}')  # where everything will be saved
+    run_dir = output_dir / f'aachen/{run_name}'  # where everything will be saved
     run_dir.mkdir(exist_ok=True, parents=True)
     reference_sfm = run_dir / f'sfm'  # the SfM model we will build
     results_path = run_dir / f'Aachen_hloc_netvlad50.txt'  # the result file

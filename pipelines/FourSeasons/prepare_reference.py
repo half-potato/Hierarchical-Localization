@@ -4,8 +4,8 @@ import argparse
 from hloc import extract_features, match_features
 from hloc import pairs_from_poses, triangulation
 
-from utils import get_timestamps, delete_unused_images
-from utils import build_empty_colmap_model
+from .utils import get_timestamps, delete_unused_images
+from .utils import build_empty_colmap_model
 
 def main():
     parser = argparse.ArgumentParser()
