@@ -64,9 +64,9 @@ class R2D2(BaseModel):
             idxs = scores.argsort()[-self.config["max_keypoints"] or None:]
 
         return {
-            'keypoints': XYS[idxs, :2],
-            'scores': scores[idxs],
-            'descriptors': desc[idxs, :],
+            'keypoints': [XYS[idxs, :2]],
+            'scores': [scores[idxs]],
+            'descriptors': [desc[idxs, :].T],
         }
 
     def to(self, device):

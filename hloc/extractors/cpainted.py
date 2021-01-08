@@ -145,7 +145,8 @@ class CPainted(BaseModel):
         #  "checkpoint": "/app/outputs/checkpoints/run_9_24/models/checkpoint003.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run-8-20-unreal-blended_05/models/checkpoint005.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run-10-23-unreal-blended_10/models/checkpoint002.pth",
-        "checkpoint": "/app/outputs/checkpoints/run-11-10-unreal-blended_08/models/checkpoint005.pth",
+        "checkpoint": "outputs/checkpoints/run-10-23-unreal-blended_08/models/checkpoint005.pth",
+        #  "checkpoint": "/app/outputs/checkpoints/run-11-10-unreal-blended_08/models/checkpoint005.pth",
     }
     def _init(self, config):
         self.config = {**self.default_config, **config}
@@ -201,7 +202,7 @@ class CPainted(BaseModel):
 
             pts.append(flipped) # (N, 2)
             scores.append(l_scores) # (N)
-            sampled.append(l_sampled) # (N, 256)
+            sampled.append(l_sampled) # (256, N)
 
         return {
             'keypoints': pts,

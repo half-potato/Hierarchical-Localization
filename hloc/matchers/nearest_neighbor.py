@@ -36,6 +36,8 @@ class NearestNeighbor(BaseModel):
         pass
 
     def _forward(self, data):
+        # assumed descriptor shape:
+        print(data['descriptors0'].shape, data['descriptors1'].shape)
         sim = torch.einsum(
             'bdn,bdm->bnm', data['descriptors0'], data['descriptors1'])
         matches0, scores0 = find_nn(

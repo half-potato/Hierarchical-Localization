@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: hloc-aachen
+  name: hloc-aachen
+spec:
+  template:
+    metadata:
+      labels:
+        app: hloc-aachen
+    spec:
+      restartPolicy: "Never"
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #       - matchExpressions:
+      #         - key: gpu-type
+      #           operator: NotIn
+      #           values:
+      #             - K40
+      containers:
+      - name: hloc-aachen
+        command: ["/bin/bash", "-c"]
+        args: 
+          # anything we forgot
+          - apt-get install -y rsync &&
+            cp -R /root/data/datasets/aachen /app/datasets/aachen &&
+            cd /app/datasets/aachen/images && unzip database_and_query_images.zip &&
+            cd /app && 
+            python3 run_pipeline.py datasets /root/data/output r2d2 aachen &&
+            rsync -a /root/local_data/output/ /root/data/output/
+        resources:
+          limits:
+            cpu: "8"
+            memory: "20Gi"
+            nvidia.com/gpu: 1 # 8 is the max if you have a max of 8 GPUs per a machine, which we do
+            ephemeral-storage: 100Gi
+          requests:
+            cpu: "8"
+            memory: "20Gi"
+            nvidia.com/gpu: 1 # 8 is the max if you have a max of 8 GPUs per a machine, which we do
+            ephemeral-storage: 100Gi
+        image: gitlab-registry.nautilus.optiputer.net/vivecenter-berkeley-edu/hloc:latest
+        volumeMounts:
+        - mountPath: /root/data
+          name: fs-store
+        - mountPath: /dev/shm
+          name: dshm
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+      - name: fs-store
+        flexVolume:
+          driver: ceph.rook.io/rook
+          fsType: ceph
+          options:
+            clusterNamespace: rook
+            fsName: nautilusfs
+            path: /half-potato
+            mountUser: half-potato
+            mountSecret: ceph-fs-secret
+      imagePullSecrets:
+      - name: regcredlp # this is the secret for you credentials to pull a private image
+
+

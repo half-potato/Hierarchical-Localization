@@ -115,5 +115,5 @@ class D2Net(BaseModel):
         return {
             'keypoints': torch.from_numpy(keypoints)[None],
             'scores': torch.from_numpy(scores)[None],
-            'descriptors': torch.from_numpy(descriptors.T)[None],
+            'descriptors': torch.from_numpy(descriptors)[None],
         }

@@ -25,6 +25,17 @@ METHODS = [
     #      },
     #  },
     {
+        "name": "d2net",
+        'model': {
+            'name': 'd2net',
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': False,
+            'resize_max': 1024,
+        },
+    },
+    {
         "name": "r2d2",
         'model': {
             'name': 'r2d2',
@@ -32,6 +43,19 @@ METHODS = [
         'matcher_name': "NN",
         'preprocessing': {
             'grayscale': False,
+            'resize_max': 1024,
+        },
+    },
+    {
+        "name": "cpainted",
+        'model': {
+            'name': 'cpainted',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': True,
             'resize_max': 1024,
         },
     },
