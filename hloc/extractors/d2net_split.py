@@ -92,9 +92,8 @@ def process_multiscale(image, detector, model, scales=[.5, 1, 2]):
         _, _, h_level, w_level = current_image.size()
 
         dense_features = model.dense_feature_extraction(current_image)
-        bw = (current_image[:, 0:1, :, :] + current_image[:, 1:2, :, :] + current_image[:, 2:3, :, :])/3
 
-        data = {"image": bw}
+        data = {"image": current_image}
         output = detector(data)
         keypoints = output["keypoints"][0].T
         scores = output["scores"][0].cpu()

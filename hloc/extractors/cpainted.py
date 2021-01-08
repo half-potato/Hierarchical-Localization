@@ -136,7 +136,7 @@ class SuperPointTrainable(SuperPointNet):
         self.load_state_dict(state_dict)
 
 class CPainted(BaseModel):
-    default_config = {
+    default_conf = {
         "threshold": 0.03,
         "maxpool_radius": 3,
         "remove_borders": 4,
@@ -149,13 +149,18 @@ class CPainted(BaseModel):
         #  "checkpoint": "/app/outputs/checkpoints/run-11-10-unreal-blended_08/models/checkpoint005.pth",
     }
     def _init(self, config):
-        self.config = {**self.default_config, **config}
+        self.config = config
         self.net = SuperPointTrainable(self.config)
         self.net.load_default_state_dict()
         self.desc_net = SP.SuperPoint(self.config)
 
     def _forward(self, data):
         x = data["image"]
+
+        if x.shape[1] > 1:
+            # convert to bw
+            x = (x[:, 0:1, :, :] + x[:, 1:2, :, :] + x[:, 2:3, :, :])/3
+
         # Resize image such that it is a multiple of the cell size
         old_size = x.shape
         B, C, H, W = old_size
@@ -208,6 +213,7 @@ class CPainted(BaseModel):
             'keypoints': pts,
             'scores': scores,
             'descriptors': sampled,
+            "heatmap": heatmap
         }
 
 # Util for extracting features
