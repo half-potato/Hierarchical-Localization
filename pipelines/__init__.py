@@ -47,6 +47,21 @@ METHODS = [
         },
     },
     {
+        "name": "cpainted+d2net",
+        'model': {
+            'name': 'd2net_split',
+            'detector_name': 'cpainted',
+            'multiscale': False,
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+        },
+    },
+    {
         "name": "cpainted",
         'model': {
             'name': 'cpainted',

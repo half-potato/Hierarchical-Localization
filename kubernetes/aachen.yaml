@@ -29,7 +29,7 @@ spec:
             cp -R /root/data/datasets/aachen /app/datasets/aachen &&
             cd /app/datasets/aachen/images && unzip database_and_query_images.zip &&
             cd /app && 
-            python3 run_pipeline.py datasets /root/data/output r2d2 aachen &&
+            python3 run_pipeline.py datasets /root/local_data/output r2d2 aachen &&
             rsync -a /root/local_data/output/ /root/data/output/
         resources:
           limits:
