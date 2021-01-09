@@ -54,9 +54,9 @@ def main(dataset_dir, output_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=Path, default='datasets/4Seasons',
+    parser.add_argument('--dataset', type=Path, default='datasets',
                         help='Path to the dataset, default: %(default)s')
-    parser.add_argument('--outputs', type=Path, default='outputs/4Seasons',
+    parser.add_argument('--outputs', type=Path, default='outputs',
                         help='Path to the output directory, default: %(default)s')
     args = parser.parse_args()
     main(args.dataset, args.outputs)

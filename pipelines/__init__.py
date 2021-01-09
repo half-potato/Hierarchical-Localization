@@ -1,11 +1,13 @@
 from . import aachen
 from . import FourSeasons
 from . import RobotCar
+from . import southbuilding
 import json
 from pathlib import Path
 from hloc.match_features import confs as MATCHER_CONFS
 
 PIPELINES = {
+    "southbuilding": southbuilding,
     "aachen": aachen,
     "4Seasons": FourSeasons,
     "RobotCar": RobotCar,

@@ -67,3 +67,4 @@ spec:
       - name: regcredlp # this is the secret for you credentials to pull a private image
 
 
+
