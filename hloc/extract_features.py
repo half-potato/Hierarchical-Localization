@@ -3,8 +3,6 @@ import torch
 from pathlib import Path
 import h5py
 import logging
-from types import SimpleNamespace
-import cv2
 import numpy as np
 from tqdm import tqdm
 import pprint
@@ -12,6 +10,7 @@ import pprint
 from . import extractors
 from .utils.base_model import dynamic_load
 from .utils.tools import map_tensor
+from .utils.image_dataset import ImageDataset
 
 
 '''
@@ -118,74 +117,14 @@ confs = {
 }
 
 
-class ImageDataset(torch.utils.data.Dataset):
-    default_conf = {
-        'globs': ['*.jpg', '*.png', '*.jpeg', '*.JPG', '*.PNG'],
-        'grayscale': False,
-        'resize_max': None,
-        'resize_force': False,
-    }
-
-    def __init__(self, root, conf):
-        self.conf = conf = SimpleNamespace(**{**self.default_conf, **conf})
-        self.root = root
-
-        self.paths = []
-        for g in conf.globs:
-            self.paths += list(Path(root).glob('**/'+g))
-        if len(self.paths) == 0:
-            raise ValueError(f'Could not find any image in root: {root}.')
-        self.paths = [i.relative_to(root) for i in self.paths]
-        logging.info(f'Found {len(self.paths)} images in root {root}.')
-
-    def __getitem__(self, idx):
-        path = self.paths[idx]
-        if self.conf.grayscale:
-            mode = cv2.IMREAD_GRAYSCALE
-        else:
-            mode = cv2.IMREAD_COLOR
-        image = cv2.imread(str(self.root / path), mode)
-        if not self.conf.grayscale:
-            image = image[:, :, ::-1]  # BGR to RGB
-        if image is None:
-            raise ValueError(f'Cannot read image {str(path)}.')
-        image = image.astype(np.float32)
-        size = image.shape[:2][::-1]
-        w, h = size
-
-        if self.conf.resize_max and (self.conf.resize_force
-                                     or max(w, h) > self.conf.resize_max):
-            scale = self.conf.resize_max / max(h, w)
-            h_new, w_new = int(round(h*scale)), int(round(w*scale))
-            image = cv2.resize(
-                image, (w_new, h_new), interpolation=cv2.INTER_LINEAR)
-
-        if self.conf.grayscale:
-            image = image[None]
-        else:
-            image = image.transpose((2, 0, 1))  # HxWxC to CxHxW
-        image = image / 255.
-
-        data = {
-            'name': str(path),
-            'image': image,
-            'original_size': np.array(size),
-        }
-        return data
-
-    def __len__(self):
-        return len(self.paths)
-
-
 @torch.no_grad()
-def main(conf, image_dir, export_dir, as_half=False, model=None):
+def main(conf, image_dir, export_dir, as_half=False):
     logging.info('Extracting local features with configuration:'
                  f'\n{pprint.pformat(conf)}')
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    if model is None:
-        Model = dynamic_load(extractors, conf['model']['name'])
-        model = Model(conf['model']).eval().to(device)
+    Model = dynamic_load(extractors, conf['model']['name'])
+    model = Model(conf['model']).eval().to(device)
 
     loader = ImageDataset(image_dir, conf['preprocessing'])
     loader = torch.utils.data.DataLoader(loader, num_workers=1)

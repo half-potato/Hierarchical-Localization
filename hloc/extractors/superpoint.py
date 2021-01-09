@@ -20,9 +20,7 @@ class SuperPoint(BaseModel):
         self.net = SP.SuperPoint(conf)
 
     def _forward(self, data):
-        a = self.net(data)
-        print(a['keypoints'][0].shape)
-        return a
+        return self.net(data)
 
     def _describe(self, data, output):
         # Compute descriptor
@@ -37,5 +35,4 @@ class SuperPoint(BaseModel):
 
             descs.append(sampled)
         output['descriptors'] = descs
-        print(descs[0].shape)
         return output

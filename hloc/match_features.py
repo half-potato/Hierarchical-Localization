@@ -31,7 +31,7 @@ confs = {
         'model': {
             'name': 'nearest_neighbor',
             'mutual_check': True,
-            'distance_threshold': 0.7,
+            'distance_threshold': None,
         },
     }
 }

@@ -1,8 +1,9 @@
-from hloc import colmap_from_nvm, pairs_from_covisibility
 #!/usr/bin/env python
 # coding: utf-8
 
 from pathlib import Path
+from hloc import colmap_from_nvm, pairs_from_covisibility
+import argparse
 
 def main(base_dir, output_dir):
     # ## Generate pairs for the SfM reconstruction
@@ -26,9 +27,9 @@ def main(base_dir, output_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=Path, default='datasets/4Seasons',
+    parser.add_argument('dataset', type=Path, default='datasets',
                         help='Path to the dataset, default: %(default)s')
-    parser.add_argument('--outputs', type=Path, default='outputs/4Seasons',
+    parser.add_argument('outputs', type=Path, default='outputs',
                         help='Path to the output directory, default: %(default)s')
     args = parser.parse_args()
     main(args.dataset, args.outputs)

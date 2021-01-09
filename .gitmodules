@@ -8,3 +8,6 @@
 [submodule "third_party/r2d2"]
 	path = third_party/r2d2
 	url = https://github.com/naver/r2d2
+[submodule "third_party/OpenIBL"]
+	path = third_party/OpenIBL
+	url = https://github.com/yxgeee/OpenIBL

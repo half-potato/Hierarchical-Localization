@@ -17,7 +17,6 @@ import extract as r2d2
 from tools.dataloader import RGB_mean, RGB_std
 import torchvision.transforms as tvf
 
-norm_RGB = tvf.Normalize(mean=RGB_mean, std=RGB_std)
 # (N, C, H, W)
 
 class R2D2(BaseModel):
