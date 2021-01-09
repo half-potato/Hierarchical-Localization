@@ -51,7 +51,8 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
             ffile = extract_features.main(feature_conf, seq_images, run_dir)
             mfile = match_features.main(matcher_conf, loc_pairs, feature_conf['output'], run_dir)
             logs_path = localize_sfm.main(
-                ref_sfm / 'model', query_list, loc_pairs, ffile, mfile, results_path)
+                ref_sfm / 'model', query_list, loc_pairs, ffile, mfile, results_path,
+                covisibility_clustering=matcher_conf["covisibility_clustering"])
             logs_paths.append(logs_path)
 
             """

@@ -2,13 +2,13 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: hloc-aachen
-  name: hloc-aachen
+    app: hloc-robotcar
+  name: hloc-robotcar
 spec:
   template:
     metadata:
       labels:
-        app: hloc-aachen
+        app: hloc-robotcar
     spec:
       restartPolicy: "Never"
       # affinity:
@@ -21,16 +21,17 @@ spec:
       #           values:
       #             - K40
       containers:
-      - name: hloc-aachen
+      - name: hloc-robotcar
         command: ["/bin/bash", "-c"]
         args: 
           # anything we forgot
           - apt-get install -y rsync &&
-            cp -R /root/data/datasets/aachen /app/datasets/aachen &&
-            cd /app/datasets/aachen/images && unzip database_and_query_images.zip &&
+            cp -R /root/data/datasets/RobotCar /app/datasets/RobotCar &&
+            cd /app/datasets/robotcar/images &&
+            for i in $(ls *.zip); do unzip $i; done &&
             cd /app && source sourceme.sh &&
-            python3 pipelines/initialize_datasets.py datasets /root/local_data/output aachen &&
-            python3 run_pipeline.py datasets /root/local_data/output r2d2 aachen &&
+            python3 pipelines/initialize_datasets.py datasets /root/local_data/output RobotCar &&
+            python3 run_pipeline.py datasets /root/local_data/output r2d2 RobotCar &&
             rsync -a /root/local_data/output/ /root/data/output/
         resources:
           limits:

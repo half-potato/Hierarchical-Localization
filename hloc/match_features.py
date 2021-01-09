@@ -25,6 +25,7 @@ confs = {
             'weights': 'outdoor',
             'sinkhorn_iterations': 50,
         },
+        "covisibility_clustering": False,
     },
     'NN': {
         'output': 'matches-NN-mutual-dist.7',
@@ -33,6 +34,7 @@ confs = {
             'mutual_check': True,
             'distance_threshold': None,
         },
+        "covisibility_clustering": True,
     }
 }
 

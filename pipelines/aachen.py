@@ -77,7 +77,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
             feature_path,
             loc_match_path,
             results_path,
-            covisibility_clustering=False)  # not required with SuperPoint+SuperGlue
+            covisibility_clustering=matcher_conf["covisibility_clustering"])
         stats["logs_path"] = logs_path
 
     return stats

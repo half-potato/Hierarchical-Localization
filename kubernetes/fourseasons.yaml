@@ -2,13 +2,13 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   labels:
-    app: hloc-aachen
-  name: hloc-aachen
+    app: hloc-fourseasons
+  name: hloc-fourseasons
 spec:
   template:
     metadata:
       labels:
-        app: hloc-aachen
+        app: hloc-fourseasons
     spec:
       restartPolicy: "Never"
       # affinity:
@@ -21,16 +21,20 @@ spec:
       #           values:
       #             - K40
       containers:
-      - name: hloc-aachen
+      - name: hloc-fourseasons
         command: ["/bin/bash", "-c"]
         args: 
           # anything we forgot
           - apt-get install -y rsync &&
-            cp -R /root/data/datasets/aachen /app/datasets/aachen &&
-            cd /app/datasets/aachen/images && unzip database_and_query_images.zip &&
+            cp -R /root/data/datasets/4Seasons /app/datasets/4Seasons &&
+            unzip recording_2020-04-07_10-20-32.zip -d reference &&
+            unzip recording_2020-03-24_17-36-22.zip -d training &&
+            unzip recording_2020-03-03_12-03-23.zip -d validation &&
+            unzip recording_2020-03-24_17-45-31.zip -d test0 &&
+            unzip recording_2020-04-23_19-37-00.zip -d test1 &&
             cd /app && source sourceme.sh &&
-            python3 pipelines/initialize_datasets.py datasets /root/local_data/output aachen &&
-            python3 run_pipeline.py datasets /root/local_data/output r2d2 aachen &&
+            python3 pipelines/initialize_datasets.py datasets /root/local_data/output fourseasons &&
+            python3 run_pipeline.py datasets /root/local_data/output r2d2 4Seasons &&
             rsync -a /root/local_data/output/ /root/data/output/
         resources:
           limits:

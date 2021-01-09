@@ -21,10 +21,12 @@ if __name__ == "__main__":
     if args.dataset == "aachen":
         print("Preparing Aachen")
         aachen_generate_pairs.main(base_dir, output_dir)
-    elif args.dataset == "aachen":
-        print("Preparing 4 Seasons")
+
+    elif args.dataset == "4Seasons":
+        print("Preparing 4Seasons")
         prepare_pairs.main(base_dir, output_dir)
-    elif args.dataset == "aachen":
+
+    elif args.dataset == "RobotCar":
         print("Preparing RobotCar")
         robotcar_dir = base_dir / "RobotCar"
         robotcar_to_colmap.main(
@@ -33,8 +35,30 @@ if __name__ == "__main__":
             output_dir / "robotcar" / "sfm_sift")
         pairs_from_covisibility.main(output_dir / "robotcar" / "sfm_sift", "pairs/robotcar-pairs-db-covis20.txt", 20)
         robotcar_generate_query_list.main(robotcar_dir, output_dir / "robotcar")
+
     elif args.dataset == "inloc":
         print("Preparing InLoc")
+        # We need to generate the query list
+        # The metadata was stripped from the images, but it seems that they were unedited from the iphone 7
+        # the format for the metadata is:
+        # camera_model, width, height, focal length, principal point (x, y), and extra stuff
+        metadata = "SIMPLE_RADIAL 3024 4032 3225.60 3225.600000 1512.000000 2016.000000 0.000000"
+        query_list_path = base_dir / "inloc" / "queries_with_intrinsics.txt"
+        queries = list((base_dir / "inloc" / "iphone7").glob("*.JPG"))
+        with query_list_path.open(mode='w') as f:
+            for query in queries:
+                f.write(f"{query.parent.name + '/' + query.name} {metadata}\n")
+        # Run image retrieval to generate pairs
+        outdir = output_dir / "inloc"
+        sfm_pairs = outdir / "pairs-retrieval.txt"
+        desc_path = retrieval.main(
+                retrieval.confs["openibl"],
+                base_dir / "inloc",
+                outdir,
+                "openibl-gdesc-4096.h5")
+        pairs_from_retrieval.main(desc_path, sfm_pairs, 40, db_prefix="cutouts_imageonly/", query_prefix="cutouts_imageonly/")
+        print(f"Saved pairs to {sfm_pairs}")
+
     elif args.dataset == "SouthBuilding":
         print("Preparing SouthBuilding")
         # Download dataset if it does not exist

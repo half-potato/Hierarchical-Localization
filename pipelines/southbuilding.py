@@ -22,8 +22,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     dataset = Path(base_dir) / "South-Building"  # change this if your dataset is somewhere else
     images = dataset / 'images'
 
-    pairs = Path('pairs/') / dname
-    sfm_pairs = pairs / "pairs-retrieval.txt"
+    sfm_pairs = output_dir / "South-Building" / "pairs-retrieval.txt"
 
     run_dir = output_dir / f'{dname}/{run_name}'  # where everything will be saved
     run_dir.mkdir(exist_ok=True, parents=True)

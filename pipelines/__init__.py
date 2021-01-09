@@ -144,7 +144,8 @@ def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization):
         "feature_conf": config,
         "matcher_conf": matcher_conf,
     }
-    json.dump(output, str(out_path), indent=4)
+    with out_path.open(mode="w") as f:
+        json.dump(output, f, indent=4)
 
 def get_config(method_name):
     for config in METHODS:
