@@ -17,7 +17,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     base_dir = Path(args.base_dir)
-    output_dir = Path(args.dataset)
+    output_dir = Path(args.outputs)
     if args.dataset == "aachen":
         print("Preparing Aachen")
         aachen_generate_pairs.main(base_dir, output_dir)
@@ -59,7 +59,7 @@ if __name__ == "__main__":
         pairs_from_retrieval.main(desc_path, sfm_pairs, 40, db_prefix="cutouts_imageonly/", query_prefix="cutouts_imageonly/")
         print(f"Saved pairs to {sfm_pairs}")
 
-    elif args.dataset == "SouthBuilding":
+    elif args.dataset == "southbuilding":
         print("Preparing SouthBuilding")
         # Download dataset if it does not exist
         if not (base_dir / "South-Building").exists():

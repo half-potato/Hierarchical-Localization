@@ -30,19 +30,19 @@ spec:
             cd /app/datasets/robotcar/images &&
             for i in $(ls *.zip); do unzip $i; done &&
             cd /app && source sourceme.sh &&
-            python3 pipelines/initialize_datasets.py datasets /root/local_data/output RobotCar &&
+            python3 pipelines/initialize_datasets.py --base_dir datasets --outputs /root/local_data/output --dataset RobotCar &&
             python3 run_pipeline.py datasets /root/local_data/output r2d2 RobotCar &&
             rsync -a /root/local_data/output/ /root/data/output/
         resources:
           limits:
             cpu: "8"
             memory: "20Gi"
-            nvidia.com/gpu: 1 # 8 is the max if you have a max of 8 GPUs per a machine, which we do
+            nvidia.com/gpu: 1
             ephemeral-storage: 100Gi
           requests:
             cpu: "8"
             memory: "20Gi"
-            nvidia.com/gpu: 1 # 8 is the max if you have a max of 8 GPUs per a machine, which we do
+            nvidia.com/gpu: 1
             ephemeral-storage: 100Gi
         image: gitlab-registry.nautilus.optiputer.net/vivecenter-berkeley-edu/hloc:latest
         volumeMounts:

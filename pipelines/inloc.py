@@ -5,7 +5,7 @@ from pathlib import Path
 from pprint import pformat
 
 from hloc import extract_features, match_features
-from hloc import triangulation, localize_sfm, visualization
+from hloc import triangulation, localize_sfm, visualization, reconstruction
 
 # # Pipeline for outdoor day-night visual localization
 
@@ -43,14 +43,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     # We triangulate the sparse 3D pointcloud given the matches and the
     # reference poses stored in the SIFT COLMAP model.
 
-    stats = triangulation.main(
-        reference_sfm,
-        output_dir / 'sfm_sift',
-        images,
-        sfm_pairs,
-        feature_path,
-        sfm_match_path,
-        colmap_path='colmap')  # change if COLMAP is not in your PATH
+    stats = reconstruction.main(reference_sfm, images, sfm_pairs, feature_path, sfm_match_path)
 
     if run_localization:
         results_path = run_dir / f'{dname}_hloc_netvlad40.txt'  # the result file

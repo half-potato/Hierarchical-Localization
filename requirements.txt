@@ -4,3 +4,4 @@ matplotlib
 scipy
 h5py
 icecream
+scikit-learn

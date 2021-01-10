@@ -27,6 +27,32 @@ METHODS = [
     #      },
     #  },
     {
+        "name": "orb",
+        'model': {
+            'name': 'cvdetectors',
+            'cvdetector_name': 'orb',
+            'cvdescriptor_name': 'orb',
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+        },
+    },
+    {
+        "name": "sift",
+        'model': {
+            'name': 'cvdetectors',
+            'cvdetector_name': 'sift',
+            'cvdescriptor_name': 'sift',
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+        },
+    },
+    {
         "name": "d2net",
         'model': {
             'name': 'd2net',

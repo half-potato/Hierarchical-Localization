@@ -29,19 +29,19 @@ spec:
             cp -R /root/data/datasets/inloc /app/datasets/inloc &&
             cd /app/datasets/inloc/ && tar -xzf iphone7.tar.gz && tar -xzf cutouts_imageonly.tar.bz2 &&
             cd /app && source sourceme.sh &&
-            python3 pipelines/initialize_datasets.py datasets /root/local_data/output inloc &&
+            python3 pipelines/initialize_datasets.py --base_dir datasets --outputs /root/local_data/output --dataset inloc &&
             python3 run_pipeline.py datasets /root/local_data/output r2d2 inloc &&
             rsync -a /root/local_data/output/ /root/data/output/
         resources:
           limits:
             cpu: "8"
             memory: "20Gi"
-            nvidia.com/gpu: 1 # 8 is the max if you have a max of 8 GPUs per a machine, which we do
+            nvidia.com/gpu: 1
             ephemeral-storage: 100Gi
           requests:
             cpu: "8"
             memory: "20Gi"
-            nvidia.com/gpu: 1 # 8 is the max if you have a max of 8 GPUs per a machine, which we do
+            nvidia.com/gpu: 1
             ephemeral-storage: 100Gi
         image: gitlab-registry.nautilus.optiputer.net/vivecenter-berkeley-edu/hloc:latest
         volumeMounts:
