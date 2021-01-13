@@ -29,7 +29,7 @@ def import_images(colmap_path, sfm_dir, image_dir, database_path,
 
     # We need to create dummy features for COLMAP to import images with EXIF
     dummy_dir = sfm_dir / 'dummy_features'
-    dummy_dir.mkdir()
+    dummy_dir.mkdir(exist_ok=True)
     for i in images:
         with open(str(dummy_dir / (i.name + '.txt')), 'w') as f:
             f.write('0 128')

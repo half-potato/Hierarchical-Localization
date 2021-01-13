@@ -51,9 +51,59 @@ RUN cd colmap && \
 	cmake .. && \
 	make -j4 && \
 	make install
+
+# build opencv with contrib
+# latest version currently has a segfault in sift
+RUN cd / \
+    && wget https://github.com/opencv/opencv/archive/4.5.1.tar.gz \
+    && wget https://github.com/opencv/opencv_contrib/archive/4.5.1.tar.gz \
+    && 
+    && mkdir opencv/build && cd opencv/build \
+    && cmake -DOPENCV_ENABLE_NONFREE=ON \
+             -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+             -DBUILD_opencv_alphamat=OFF \
+             -DBUILD_opencv_aruco=OFF \
+             -DBUILD_opencv_bgsegm=OFF \
+             -DBUILD_opencv_bioinspired=OFF \
+             -DBUILD_opencv_ccalib=OFF \
+             -DBUILD_opencv_cnn_3dobj=OFF \
+             -DBUILD_opencv_cvv=OFF \
+             -DBUILD_opencv_datasets=OFF \
+             -DBUILD_opencv_dnn_objdetect=OFF \
+             -DBUILD_opencv_dnn_superres=OFF \
+             -DBUILD_opencv_dnns_easily_fooled=OFF \
+             -DBUILD_opencv_dpm=OFF \
+             -DBUILD_opencv_face=OFF \
+             -DBUILD_opencv_freetype=OFF \
+             -DBUILD_opencv_fuzzy=OFF \
+             -DBUILD_opencv_hdf=OFF \
+             -DBUILD_opencv_julia=OFF \
+             -DBUILD_opencv_line_descriptor=OFF \
+             -DBUILD_opencv_matlab=OFF \
+             -DBUILD_opencv_mcc=OFF \
+             -DBUILD_opencv_optflow=OFF \
+             -DBUILD_opencv_ovis=OFF \
+             -DBUILD_opencv_plot=OFF \
+             -DBUILD_opencv_reg=OFF \
+             -DBUILD_opencv_rgbd=OFF \
+             -DBUILD_opencv_saliency=OFF \
+             -DBUILD_opencv_sfm=OFF \
+             -DBUILD_opencv_stereo=OFF \
+             -DBUILD_opencv_structured_light=OFF \
+             -DBUILD_opencv_surface_matching=OFF \
+             -DBUILD_opencv_text=OFF \
+             -DBUILD_opencv_tracking=OFF \
+             -DBUILD_opencv_xfeatures2d=ON \
+             -DBUILD_opencv_ximgproc=OFF \
+             -DBUILD_opencv_xobjdetect=OFF \
+             -DBUILD_opencv_xphoto=OFF \
+              .. \
+    && make -j16 \
+    && make install
+
 RUN pip3 install scikit-build
 RUN pip3 install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
-RUN pip3 install opencv-python
+# RUN pip3 install opencv-python
 COPY . /app
 WORKDIR app/
 RUN pip3 install --upgrade pip

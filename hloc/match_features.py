@@ -9,6 +9,9 @@ import pprint
 from . import matchers
 from .utils.base_model import dynamic_load
 from .utils.parsers import names_to_pair
+import numpy as np
+
+from icecream import ic
 
 
 '''
@@ -26,6 +29,26 @@ confs = {
             'sinkhorn_iterations': 50,
         },
         "covisibility_clustering": False,
+    },
+    'L2': {
+        'output': 'matches-NN-mutual-dist.7',
+        'model': {
+            'name': 'cvmatcher',
+            'mutual_check': True,
+            'distance_threshold': None,
+            'norm': 'NORM_L2',
+        },
+        "covisibility_clustering": True,
+    },
+    'HAMMING': {
+        'output': 'matches-NN-mutual-dist.7',
+        'model': {
+            'name': 'cvmatcher',
+            'mutual_check': True,
+            'distance_threshold': None,
+            'norm': 'NORM_HAMMING',
+        },
+        "covisibility_clustering": True,
     },
     'NN': {
         'output': 'matches-NN-mutual-dist.7',

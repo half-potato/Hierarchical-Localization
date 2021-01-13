@@ -14,18 +14,64 @@ PIPELINES = {
 }
 
 METHODS = [
-    #  {
-    #      'model': {
-    #          'name': 'superpoint',
-    #          'nms_radius': 3,
-    #          'max_keypoints': 4096,
-    #      },
-    #      'matcher_name': "superglue",
-    #      'preprocessing': {
-    #          'grayscale': True,
-    #          'resize_max': 1024,
-    #      },
-    #  },
+    {
+        "name": "cpainted+brief",
+        'model': {
+            'name': 'split',
+            'detector': 'cpainted',
+            'descriptor': 'cvdetectors',
+            'cvdetector_name': 'fast',
+            'cvdescriptor_name': 'brief',
+        },
+        'matcher_name': "HAMMING",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+        },
+    },
+    {
+        "name": "cpainted+orb",
+        'model': {
+            'name': 'split',
+            'detector': 'cpainted',
+            'descriptor': 'cvdetectors',
+            'cvdetector_name': 'orb',
+            'cvdescriptor_name': 'orb',
+        },
+        'matcher_name': "HAMMING",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+        },
+    },
+    {
+        "name": "cpainted+sift",
+        'model': {
+            'name': 'split',
+            'detector': 'cpainted',
+            'descriptor': 'cvdetectors',
+            'cvdetector_name': 'sift',
+            'cvdescriptor_name': 'sift',
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+        },
+    },
+    {
+        "name": "fast+brief",
+        'model': {
+            'name': 'cvdetectors',
+            'cvdetector_name': 'fast',
+            'cvdescriptor_name': 'brief',
+        },
+        'matcher_name': "HAMMING",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+        },
+    },
     {
         "name": "orb",
         'model': {
@@ -33,7 +79,7 @@ METHODS = [
             'cvdetector_name': 'orb',
             'cvdescriptor_name': 'orb',
         },
-        'matcher_name': "NN",
+        'matcher_name': "HAMMING",
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1024,
@@ -46,7 +92,7 @@ METHODS = [
             'cvdetector_name': 'sift',
             'cvdescriptor_name': 'sift',
         },
-        'matcher_name': "NN",
+        'matcher_name': "L2",
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1024,
