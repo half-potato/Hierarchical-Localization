@@ -126,6 +126,8 @@ class SuperPointTrainable(SuperPointNet):
 
     def load_default_state_dict(self):
         path = self.config["checkpoint"]
+        path = Path(__file__).parent / Path(path)
+        print(path)
         ckpt = torch.load(path)
         if "state_dict" in ckpt:
             state_dict = ckpt["state_dict"]
@@ -145,7 +147,7 @@ class CPainted(BaseModel):
         #  "checkpoint": "/app/outputs/checkpoints/run_9_24/models/checkpoint003.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run-8-20-unreal-blended_05/models/checkpoint005.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run-10-23-unreal-blended_10/models/checkpoint002.pth",
-        "checkpoint": "outputs/checkpoints/run-10-23-unreal-blended_08/models/checkpoint005.pth",
+        "checkpoint": "../../third_party/cpainted/run-10-23-unreal-blended_08/models/checkpoint005.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run-11-10-unreal-blended_08/models/checkpoint005.pth",
     }
     def _init(self, config):
