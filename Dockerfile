@@ -54,10 +54,12 @@ RUN cd colmap && \
 
 # build opencv with contrib
 # latest version currently has a segfault in sift
+RUN pip3 install numpy
 RUN cd / \
-    && wget https://github.com/opencv/opencv/archive/4.5.1.tar.gz \
-    && wget https://github.com/opencv/opencv_contrib/archive/4.5.1.tar.gz \
-    && 
+    && wget https://github.com/opencv/opencv/archive/4.5.1.tar.gz -O opencv.tar.gz \
+    && wget https://github.com/opencv/opencv_contrib/archive/4.5.1.tar.gz -O opencv_contrib.tar.gz \
+    && tar -xzf opencv.tar.gz && mv opencv-4.5.1 opencv \
+    && tar -xzf opencv_contrib.tar.gz && mv opencv_contrib-4.5.1 opencv_contrib \
     && mkdir opencv/build && cd opencv/build \
     && cmake -DOPENCV_ENABLE_NONFREE=ON \
              -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
