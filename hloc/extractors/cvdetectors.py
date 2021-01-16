@@ -50,6 +50,7 @@ class CVDetectors(BaseModel):
             for kp in kpts:
                 l_pts.append([int(kp.pt[1]+0.5), int(kp.pt[0]+0.5)])
                 l_scores.append(kp.response)
+            print(len(l_pts))
             pts.append(torch.tensor(l_pts)) # (N, 2)
             scores.append(torch.tensor(l_scores)) # (N)
             sampled.append(torch.tensor(desc.T)) # (256, N)
@@ -73,11 +74,11 @@ class CVDetectors(BaseModel):
             img = x[i]
             img = (img.view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
             pts = output['keypoints'][i].float() # (N, 2)
-            ss = output['scores'][i].float() # (N, 2)
+            ss = output['scores'][i].float() # (N)
             # convert to keypoints
             kpts = []
             for (pt, s) in zip(pts, ss):
-                kpts.append(cv2.KeyPoint(float(pt[1]-0.5), float(pt[0]-0.5), _response=s.item(), _size=31))
+                kpts.append(cv2.KeyPoint(float(pt[1]-0.5), float(pt[0]-0.5), _size=31))
 
             kpts, desc = self.descriptor.compute(img, kpts)
             l_pts = []
@@ -87,10 +88,10 @@ class CVDetectors(BaseModel):
                 l_scores.append(kp.response)
             points.append(torch.tensor(l_pts)) # (N, 2)
             scores.append(torch.tensor(l_scores)) # (N)
-            sampled.append(torch.tensor(desc.T)) # (256, N)
+            sampled.append(torch.tensor(desc.T)) # (32, N)
 
         return {
-            'keypoints': pts,
+            'keypoints': points,
             'scores': scores,
             'descriptors': sampled,
         }
