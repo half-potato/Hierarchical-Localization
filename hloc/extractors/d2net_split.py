@@ -25,7 +25,7 @@ class D2Net_Split(BaseModel):
     default_conf = {
         'model_name': 'd2_tf.pth',
         'use_relu': True,
-        'multiscale': False,
+        'multiscale': True,
     }
     required_inputs = ['image']
 
@@ -66,7 +66,7 @@ class D2Net_Split(BaseModel):
         return {
             'keypoints': torch.from_numpy(keypoints)[None],
             'scores': torch.from_numpy(scores)[None],
-            'descriptors': torch.from_numpy(descriptors)[None],
+            'descriptors': torch.from_numpy(descriptors).T[None],
         }
 
 

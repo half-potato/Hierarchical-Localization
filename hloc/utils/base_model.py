@@ -26,7 +26,6 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
         """To be implemented by the child class."""
         raise NotImplementedError
 
-    @abstractmethod
     def _forward(self, data):
         """To be implemented by the child class."""
         raise NotImplementedError

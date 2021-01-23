@@ -26,21 +26,22 @@ spec:
         args: 
           # anything we forgot
           - apt-get install -y rsync &&
-            cp -R /root/data/datasets/aachen /app/datasets/aachen &&
-            cd /app/datasets/aachen/images && unzip database_and_query_images.zip &&
+            mkdir -p /root/local_data/datasets/ &&
+            cp -R /root/data/datasets/aachen /root/local_data/datasets/aachen &&
+            cd /root/local_data/datasets/aachen/images && unzip database_and_query_images.zip &&
             cd /app && source sourceme.sh &&
-            python3 pipelines/initialize_datasets.py --base_dir datasets --outputs /root/local_data/output --dataset aachen &&
-            python3 run_pipeline.py datasets /root/local_data/output r2d2 aachen &&
+            python3 pipelines/initialize_datasets.py --base_dir /root/local_data/datasets --outputs /root/local_data/output --dataset aachen &&
+            python3 run_pipeline.py /root/local_data/datasets /root/local_data/output all aachen &&
             rsync -a /root/local_data/output/ /root/data/output/
         resources:
           limits:
             cpu: "8"
-            memory: "20Gi"
+            memory: "80Gi"
             nvidia.com/gpu: 1
             ephemeral-storage: 100Gi
           requests:
             cpu: "8"
-            memory: "20Gi"
+            memory: "40Gi"
             nvidia.com/gpu: 1
             ephemeral-storage: 100Gi
         image: gitlab-registry.nautilus.optiputer.net/vivecenter-berkeley-edu/hloc:latest

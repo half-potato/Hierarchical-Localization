@@ -1,0 +1,14 @@
+pipeline, method, num_reg_images, num_sparse_points, num_observations, mean_track_length, num_observations_per_image, mean_reproj_error, num_input_images, avg_num_points
+southbuilding, orb, 102, 26590, 101056, 3.800527, 990.745098, 1.271764, 128, 3997.8125
+southbuilding, d2net, 128, 74067, 208737, 2.818219, 1630.757812, 1.326454, 128, 5536.4609375
+southbuilding, sift, 128, 52781, 219605, 4.160683, 1715.664062, 1.043651, 128, 5840.65625
+southbuilding, cpainted+d2net, -1, -1, -1, -1, -1, -1, 128, 507.6171875
+southbuilding, cpainted+superpoint, 128, 28154, 135942, 4.828515, 1062.046875, 1.371731, 128, 1681.8828125
+southbuilding, r2d2, 128, 45955, 267147, 5.81323, 2087.085938, 1.429776, 128, 4096.0
+southbuilding, fast+brief, 128, 37016, 162604, 4.392803, 1270.34375, 1.118453, 128, 4214.328125
+southbuilding, superpoint, 128, 53318, 246080, 4.615327, 1922.5, 1.40021, 128, 3085.6171875
+southbuilding, cpainted+r2d2, 128, 46517, 257910, 5.544425, 2014.921875, 1.452667, 128, 4096.0
+southbuilding, cpainted+sift, 128, 35135, 124566, 3.545354, 973.171875, 1.199202, 128, 3412.328125
+southbuilding, cpainted+orb, 87, 19526, 68858, 3.526478, 791.471264, 1.142467, 128, 3115.1328125
+southbuilding, cpainted+brief, 128, 39474, 159442, 4.039165, 1245.640625, 1.282532, 128, 3147.7109375
+southbuilding, cpainted, 57, 8657, 29396, 3.395634, 515.719298, 1.139761, 128, 2312.984375

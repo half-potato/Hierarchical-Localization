@@ -29,7 +29,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     reference_sfm = run_dir / f'sfm'  # the SfM model we will build
 
     # ## Extract local features for database and query images
-    feature_path = extract_features.main(feature_conf, images, run_dir)
+    feature_path, avg_num_points = extract_features.main(feature_conf, images, run_dir, return_num_points=True)
 
     # The function returns the path of the file in which all the extracted features are stored.
 
@@ -44,6 +44,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     # reference poses stored in the SIFT COLMAP model.
 
     stats = reconstruction.main(reference_sfm, images, sfm_pairs, feature_path, sfm_match_path)
+    stats['avg_num_points'] = avg_num_points
 
     if run_localization:
         print(f"No localization for {dname} because there are no queries")

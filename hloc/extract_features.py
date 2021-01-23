@@ -118,7 +118,7 @@ confs = {
 
 
 @torch.no_grad()
-def main(conf, image_dir, export_dir, as_half=False):
+def main(conf, image_dir, export_dir, as_half=False, return_num_points=False):
     logging.info('Extracting local features with configuration:'
                  f'\n{pprint.pformat(conf)}')
 
@@ -133,6 +133,7 @@ def main(conf, image_dir, export_dir, as_half=False):
     feature_path.parent.mkdir(exist_ok=True, parents=True)
     feature_file = h5py.File(str(feature_path), 'a')
 
+    total_num_points = 0
     for data in tqdm(loader):
         if data['name'][0] in feature_file:
             continue
@@ -145,6 +146,7 @@ def main(conf, image_dir, export_dir, as_half=False):
             size = np.array(data['image'].shape[-2:][::-1])
             scales = (original_size / size).astype(np.float32)
             pred['keypoints'] = (pred['keypoints'] + .5) * scales[None] - .5
+            total_num_points += pred['keypoints'].shape[0]
 
         if as_half:
             for k in pred:
@@ -161,7 +163,10 @@ def main(conf, image_dir, export_dir, as_half=False):
     feature_file.close()
     logging.info('Finished exporting features.')
 
-    return feature_path
+    if return_num_points:
+        return feature_path, total_num_points/len(loader)
+    else:
+        return feature_path
 
 
 if __name__ == '__main__':

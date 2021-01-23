@@ -28,7 +28,7 @@ spec:
           - apt-get install -y rsync &&
             cd /app && source sourceme.sh &&
             python3 pipelines/initialize_datasets.py --base_dir datasets --outputs /root/local_data/output --dataset southbuilding &&
-            python3 run_pipeline.py datasets /root/local_data/output cpainted+brief southbuilding &&
+            python3 run_pipeline.py datasets /root/local_data/output all southbuilding &&
             rsync -a /root/local_data/output/ /root/data/output/
         resources:
           limits:

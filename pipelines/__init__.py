@@ -15,6 +15,19 @@ PIPELINES = {
 
 METHODS = [
     {
+        "name": "sift+brief",
+        'model': {
+            'name': 'cvdetectors',
+            'cvdetector_name': 'sift',
+            'cvdescriptor_name': 'brief',
+        },
+        'matcher_name': "HAMMING",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1024,
+        },
+    },
+    {
         "name": "cpainted+brief",
         'model': {
             'name': 'split',
@@ -22,6 +35,7 @@ METHODS = [
             'descriptor': 'cvdetectors',
             'cvdetector_name': 'fast',
             'cvdescriptor_name': 'brief',
+            "threshold": 0.01,
         },
         'matcher_name': "HAMMING",
         'preprocessing': {
@@ -37,6 +51,7 @@ METHODS = [
             'descriptor': 'cvdetectors',
             'cvdetector_name': 'orb',
             'cvdescriptor_name': 'orb',
+            "threshold": 0.01,
         },
         'matcher_name': "HAMMING",
         'preprocessing': {
@@ -49,9 +64,9 @@ METHODS = [
         'model': {
             'name': 'split',
             'detector': 'cpainted',
-            'descriptor': 'cvdetectors',
-            'cvdetector_name': 'sift',
-            'cvdescriptor_name': 'sift',
+            'descriptor': 'patchdescriptor',
+            'patch_descriptor_name': 'sift',
+            "threshold": 0.01,
         },
         'matcher_name': "NN",
         'preprocessing': {
@@ -195,6 +210,9 @@ METHODS = [
     },
 ]
 
+def gen_out_path(output_dir, pipeline_name):
+    return output_dir / pipeline_name
+
 def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization):
     base_dir = Path(base_dir)
     output_dir = Path(output_dir)
@@ -209,7 +227,7 @@ def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization):
     stats = pipeline.run_test(base_dir, output_dir, config, matcher_conf, run_name, run_localization=run_localization)
 
     # Save results
-    out_path = output_dir / pipeline_name / f"{run_name}.json"
+    out_path = gen_out_path(output_dir, pipeline_name) / f"{run_name}.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     output = {
         "stats": stats,

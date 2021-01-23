@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent / '../../third_party'))
 import SuperGluePretrainedNetwork.models.superpoint as SP
+from cpaint.models import subpixel
 
 
 dii_filter = torch.tensor([
@@ -142,12 +143,12 @@ class CPainted(BaseModel):
         "threshold": 0.03,
         "maxpool_radius": 3,
         "remove_borders": 4,
-        "max_keypoints": 2048,
+        "max_keypoints": 4096,
         #  "checkpoint": "/app/outputs/checkpoints/no_forest_low_thres/models/checkpoint001.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run_9_24/models/checkpoint003.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run-8-20-unreal-blended_05/models/checkpoint005.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run-10-23-unreal-blended_10/models/checkpoint002.pth",
-        "checkpoint": "../../third_party/cpainted/run-10-23-unreal-blended_08/models/checkpoint005.pth",
+        "checkpoint": "../../third_party/cpaint/checkpoints/first_sota_cpainted.pth",
         #  "checkpoint": "/app/outputs/checkpoints/run-11-10-unreal-blended_08/models/checkpoint005.pth",
     }
     def _init(self, config):
@@ -194,6 +195,7 @@ class CPainted(BaseModel):
         scores = []
         sampled = []
         for i in range(B):
+            # row col
             y, x = torch.where(pooled[i].squeeze() > self.config["threshold"])
             if len(y) > self.config["max_keypoints"]:
                 threshold, _ = torch.sort(pooled[i].flatten(), descending=True)
@@ -201,6 +203,8 @@ class CPainted(BaseModel):
                 y, x = torch.where(pooled[i].squeeze() > threshold)
             l_pts = torch.stack((y, x), dim=1)
             l_scores = heatmap[i].squeeze()[l_pts[:, 0], l_pts[:, 1]]
+            # localize to the subpixel
+            l_pts = subpixel.localize(heatmap[0], l_pts, 1)
             flipped = torch.flip(l_pts, [1]).float()
 
             l_sampled = sample_descriptors(

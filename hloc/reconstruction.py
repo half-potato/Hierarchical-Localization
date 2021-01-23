@@ -85,7 +85,9 @@ def run_reconstruction(colmap_path, model_path, database_path, image_dir,
     models = list(model_path.iterdir())
     if len(models) == 0:
         logging.error('Could not reconstruct any model!')
-        return False
+        return {
+        "reconstruction_failure": True,
+    }
     logging.info(f'Reconstructed {len(models)} models.')
 
     largest_model = None

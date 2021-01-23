@@ -106,9 +106,10 @@ RUN cd / \
 RUN pip3 install scikit-build
 RUN pip3 install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 # RUN pip3 install opencv-python
-COPY . /app
-WORKDIR app/
 RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt
+COPY ./requirements.txt /
+RUN pip3 install -r /requirements.txt
 RUN pip3 install jupyterlab notebook
 RUN pip3 install git+https://github.com/mihaidusmanu/pycolmap
+COPY . /app
+WORKDIR app/

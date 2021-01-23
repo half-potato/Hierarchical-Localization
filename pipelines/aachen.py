@@ -30,7 +30,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     reference_sfm = run_dir / f'sfm'  # the SfM model we will build
 
     # ## Extract local features for database and query images
-    feature_path = extract_features.main(feature_conf, images, run_dir)
+    feature_path, avg_num_points = extract_features.main(feature_conf, images, run_dir, return_num_points=True)
 
     # The function returns the path of the file in which all the extracted features are stored.
 
@@ -52,6 +52,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
         feature_path,
         sfm_match_path,
         colmap_path='colmap')  # change if COLMAP is not in your PATH
+    stats['avg_num_points'] = avg_num_points
 
     if run_localization:
         results_path = run_dir / f'{dname}_hloc_netvlad50.txt'  # the result file
