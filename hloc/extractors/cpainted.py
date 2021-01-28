@@ -141,13 +141,13 @@ class SuperPointTrainable(SuperPointNet):
 
 class CPainted(BaseModel):
     default_conf = {
-        "threshold": 0.004,
-        #  "threshold": 0.03,
+        #  "threshold": 0.004,
+        "threshold": 0.03,
+        #  "threshold": 0.01,
         "maxpool_radius": 3,
         "remove_borders": 4,
         "max_keypoints": 4096,
         "checkpoint": "../../third_party/cpaint/checkpoints/third_sota_cpainted.pth",
-        #  "checkpoint": "../../third_party/cpaint/checkpoints/second_sota_cpainted.pth",
         #  "checkpoint": "../../third_party/cpaint/checkpoints/best_sota_cpainted.pth",
     }
     def _init(self, config):
@@ -158,10 +158,6 @@ class CPainted(BaseModel):
 
     def _forward(self, data):
         x = data["image"]
-
-        if x.shape[1] > 1:
-            # convert to bw
-            x = (x[:, 0:1, :, :] + x[:, 1:2, :, :] + x[:, 2:3, :, :])/3
 
         # Resize image such that it is a multiple of the cell size
         old_size = x.shape
@@ -178,16 +174,17 @@ class CPainted(BaseModel):
         desc = result["raw_desc"]
         D = desc.shape[1]
         heatmap = unpad_multiple(heatmap, old_size, input_size_multiple)
-        g_heatmap = score_gaussian_peaks(heatmap)
+        #  g_heatmap = score_gaussian_peaks(heatmap)
 
         # remove border, apply nms + threshold
         # Shape: (3, N)
         mask1 = mask_border(heatmap, border=self.config["remove_borders"])
 #         mask2 = mask_max(heatmap, radius=self.config["maxpool_radius"])
 
-        mask2 = mask_max(g_heatmap, radius=self.config["maxpool_radius"])
+        mask2 = mask_max(heatmap, radius=self.config["maxpool_radius"])
 
-        pooled = mask1 * mask2 * g_heatmap
+        pooled = mask1 * mask2 * heatmap
+        _, descriptors = self.desc_net._forward(data)
 
         # torch where over batch
         pts = []
@@ -203,7 +200,7 @@ class CPainted(BaseModel):
             l_pts = torch.stack((y, x), dim=1)
             l_scores = heatmap[i].squeeze()[l_pts[:, 0], l_pts[:, 1]]
             # localize to the subpixel
-            l_pts, sizes = subpixel.localize(heatmap[i], l_pts, 1)
+            #  l_pts, sizes = subpixel.localize(heatmap[i], l_pts, 1)
             flipped = torch.flip(l_pts, [1]).float()
 
             l_sampled = sample_descriptors(
@@ -223,6 +220,7 @@ class CPainted(BaseModel):
                 for pt in flipped.cpu():
                     kpts.append(cv2.KeyPoint(float(pt[0]), float(pt[1]), _size=size, _angle=0))
 
+                print(len(kpts))
                 drawn = img.copy()
                 drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
@@ -297,7 +295,7 @@ def gaussian_filter(kernel_size, sigma, channels=1):
     gaussian_filter.weight.requires_grad = False
     return gaussian_filter
 
-gf = gaussian_filter(5, 1.5).cuda()
+gf = gaussian_filter(5, 1).cuda()
 
 def score_gaussian_peaks(score_map):
     batch = score_map.view(1, 1, score_map.shape[-2], score_map.shape[-1]).float()
