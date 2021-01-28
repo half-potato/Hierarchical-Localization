@@ -1,3 +1,4 @@
+import cv2
 import os
 import math
 import torch
@@ -10,6 +11,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent / '../../third_party'))
 import SuperGluePretrainedNetwork.models.superpoint as SP
 from cpaint.models import subpixel
+import matplotlib.pyplot as plt
 
 
 dii_filter = torch.tensor([
@@ -128,7 +130,6 @@ class SuperPointTrainable(SuperPointNet):
     def load_default_state_dict(self):
         path = self.config["checkpoint"]
         path = Path(__file__).parent / Path(path)
-        print(path)
         ckpt = torch.load(path)
         if "state_dict" in ckpt:
             state_dict = ckpt["state_dict"]
@@ -140,16 +141,14 @@ class SuperPointTrainable(SuperPointNet):
 
 class CPainted(BaseModel):
     default_conf = {
-        "threshold": 0.03,
+        "threshold": 0.004,
+        #  "threshold": 0.03,
         "maxpool_radius": 3,
         "remove_borders": 4,
         "max_keypoints": 4096,
-        #  "checkpoint": "/app/outputs/checkpoints/no_forest_low_thres/models/checkpoint001.pth",
-        #  "checkpoint": "/app/outputs/checkpoints/run_9_24/models/checkpoint003.pth",
-        #  "checkpoint": "/app/outputs/checkpoints/run-8-20-unreal-blended_05/models/checkpoint005.pth",
-        #  "checkpoint": "/app/outputs/checkpoints/run-10-23-unreal-blended_10/models/checkpoint002.pth",
-        "checkpoint": "../../third_party/cpaint/checkpoints/first_sota_cpainted.pth",
-        #  "checkpoint": "/app/outputs/checkpoints/run-11-10-unreal-blended_08/models/checkpoint005.pth",
+        "checkpoint": "../../third_party/cpaint/checkpoints/third_sota_cpainted.pth",
+        #  "checkpoint": "../../third_party/cpaint/checkpoints/second_sota_cpainted.pth",
+        #  "checkpoint": "../../third_party/cpaint/checkpoints/best_sota_cpainted.pth",
     }
     def _init(self, config):
         self.config = config
@@ -179,16 +178,16 @@ class CPainted(BaseModel):
         desc = result["raw_desc"]
         D = desc.shape[1]
         heatmap = unpad_multiple(heatmap, old_size, input_size_multiple)
+        g_heatmap = score_gaussian_peaks(heatmap)
 
         # remove border, apply nms + threshold
         # Shape: (3, N)
         mask1 = mask_border(heatmap, border=self.config["remove_borders"])
 #         mask2 = mask_max(heatmap, radius=self.config["maxpool_radius"])
 
-#         heatmap = score_gaussian_peaks(heatmap)
-        mask2 = mask_max(heatmap, radius=self.config["maxpool_radius"])
+        mask2 = mask_max(g_heatmap, radius=self.config["maxpool_radius"])
 
-        pooled = mask1 * mask2 * heatmap
+        pooled = mask1 * mask2 * g_heatmap
 
         # torch where over batch
         pts = []
@@ -204,7 +203,7 @@ class CPainted(BaseModel):
             l_pts = torch.stack((y, x), dim=1)
             l_scores = heatmap[i].squeeze()[l_pts[:, 0], l_pts[:, 1]]
             # localize to the subpixel
-            l_pts = subpixel.localize(heatmap[0], l_pts, 1)
+            l_pts, sizes = subpixel.localize(heatmap[i], l_pts, 1)
             flipped = torch.flip(l_pts, [1]).float()
 
             l_sampled = sample_descriptors(
@@ -214,6 +213,26 @@ class CPainted(BaseModel):
             pts.append(flipped) # (N, 2)
             scores.append(l_scores) # (N)
             sampled.append(l_sampled) # (256, N)
+
+            if False:
+                img = (data["image"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
+                # compute orientation
+                size = 4
+                # convert to keypoints
+                kpts = []
+                for pt in flipped.cpu():
+                    kpts.append(cv2.KeyPoint(float(pt[0]), float(pt[1]), _size=size, _angle=0))
+
+                drawn = img.copy()
+                drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+                plt.figure()
+                plt.imshow(heatmap.squeeze().cpu())
+                plt.figure()
+                plt.imshow(g_heatmap.squeeze().cpu())
+                plt.figure()
+                plt.imshow(drawn)
+                plt.show()
 
         return {
             'keypoints': pts,
@@ -244,14 +263,6 @@ def mask_max(score_map, radius=8):
         )
     mask = l_max == batch
     return mask.view(N, H, W)
-
-def score_gaussian_peaks(score_map):
-    batch = score_map.view(1, 1, score_map.shape[-2], score_map.shape[-1]).float()
-    batch = gf(batch)
-    dii = F.conv2d(batch, dii_filter, padding=1, dilation=1, stride=1)
-    djj = F.conv2d(batch, djj_filter, padding=1, dilation=1, stride=1)
-    score = torch.min(-dii, -djj)/2
-    return score
 
 
 def gaussian_filter(kernel_size, sigma, channels=1):
@@ -286,7 +297,15 @@ def gaussian_filter(kernel_size, sigma, channels=1):
     gaussian_filter.weight.requires_grad = False
     return gaussian_filter
 
-gf = gaussian_filter(3, 1).cuda()
+gf = gaussian_filter(5, 1.5).cuda()
+
+def score_gaussian_peaks(score_map):
+    batch = score_map.view(1, 1, score_map.shape[-2], score_map.shape[-1]).float()
+    batch = gf(batch)
+    dii = F.conv2d(batch, dii_filter, padding=1, dilation=1, stride=1)
+    djj = F.conv2d(batch, djj_filter, padding=1, dilation=1, stride=1)
+    score = torch.min(-dii, -djj)/2
+    return score
 
 def get_padding_for_multiple(imshape, multiple):
     N, C, H, W = imshape

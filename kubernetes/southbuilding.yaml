@@ -26,9 +26,24 @@ spec:
         args: 
           # anything we forgot
           - apt-get install -y rsync &&
+            cd /app/third_party/cpaint && source sourceme.sh &&
             cd /app && source sourceme.sh &&
             python3 pipelines/initialize_datasets.py --base_dir datasets --outputs /root/local_data/output --dataset southbuilding &&
-            python3 run_pipeline.py datasets /root/local_data/output all southbuilding &&
+            python3 run_pipeline.py datasets /root/local_data/output sift southbuilding &&
+            rsync -a /root/local_data/output/ /root/data/output/ &&
+            python3 run_pipeline.py datasets /root/local_data/output orb southbuilding &&
+            rsync -a /root/local_data/output/ /root/data/output/ &&
+            python3 run_pipeline.py datasets /root/local_data/output cpainted+sift southbuilding &&
+            rsync -a /root/local_data/output/ /root/data/output/ &&
+            python3 run_pipeline.py datasets /root/local_data/output cpainted+brief southbuilding &&
+            rsync -a /root/local_data/output/ /root/data/output/ &&
+            python3 run_pipeline.py datasets /root/local_data/output fast+brief southbuilding &&
+            rsync -a /root/local_data/output/ /root/data/output/ &&
+            python3 run_pipeline.py datasets /root/local_data/output cpainted+orb southbuilding &&
+            rsync -a /root/local_data/output/ /root/data/output/ &&
+            python3 run_pipeline.py datasets /root/local_data/output cpainted+superpoint southbuilding &&
+            rsync -a /root/local_data/output/ /root/data/output/ &&
+            python3 run_pipeline.py datasets /root/local_data/output superpoint southbuilding &&
             rsync -a /root/local_data/output/ /root/data/output/
         resources:
           limits:

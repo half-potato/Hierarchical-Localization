@@ -29,6 +29,9 @@ DESCRIPTORS = {
     }
 }
 
+def keypoint_scale(image, kpts):
+    # blur image with 1.6 sigma blur
+
 class PatchDescriptor(BaseModel):
     default_conf = {
     }
@@ -70,7 +73,7 @@ class PatchDescriptor(BaseModel):
             img = (img.view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
             kpts = []
             for pt in pts:
-                kpts.append(cv2.KeyPoint(float(pt[0].cpu()-0.5), float(pt[1].cpu()-0.5), _size=int(float(pt[1])/50), _angle=0))
+                kpts.append(cv2.KeyPoint(float(pt[0].cpu()-0.5), float(pt[1].cpu()-0.5), _size=10, _angle=0))
 
             drawn = img.copy()
             print(img.dtype, img.shape)

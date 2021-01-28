@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitor
+spec:
+  selector:
+    matchLabels:
+      run: monitor
+  template:
+    metadata:
+      labels:
+        run: monitor
+    spec:
+      containers:
+      - name: monitor
+        image: ubuntu
+        volumeMounts:
+        - mountPath: /root/data
+          name: fs-store
+        resources:
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+          requests:
+            cpu: "0.01"
+            memory: "100Mi"
+      volumes:
+      - name: fs-store
+        flexVolume:
+          driver: ceph.rook.io/rook
+          fsType: ceph
+          options:
+            clusterNamespace: rook
+            fsName: nautilusfs
+            path: /half-potato
+            mountUser: half-potato
+            mountSecret: ceph-fs-secret
+

@@ -67,10 +67,10 @@ class CVDetectors(BaseModel):
             for kp in kpts:
                 l_pts.append([kp.pt[0], kp.pt[1]])
                 l_scores.append(kp.response)
-            #  drawn = img.copy()
-            #  drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-            #  plt.imshow(drawn)
-            #  plt.show()
+            drawn = img.copy()
+            drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+            plt.imshow(drawn)
+            plt.show()
             pts.append(torch.tensor(l_pts)) # (N, 2)
             scores.append(torch.tensor(l_scores)) # (N)
             sampled.append(torch.tensor(desc.T)) # (256, N)
@@ -101,12 +101,14 @@ class CVDetectors(BaseModel):
             # convert to keypoints
             kpts = []
             for (pt, s) in zip(pts, ss):
-                kpts.append(cv2.KeyPoint(float(pt[0]-0.5), float(pt[1]-0.5), _size=size, _angle=orientations[int(pt[1]), int(pt[0])]))
+                kpts.append(cv2.KeyPoint(pt[0], pt[1], _size=size, _angle=orientations[int(pt[1]), int(pt[0])]))
 
-            #  drawn = img.copy()
-            #  drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-            #  plt.imshow(drawn)
-            #  plt.show()
+            drawn = img.copy()
+            drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+            plt.figure()
+            plt.imshow(drawn)
+            plt.show()
 
             kpts, desc = self.descriptor.compute(img, kpts)
             l_pts = []

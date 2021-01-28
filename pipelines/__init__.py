@@ -66,7 +66,7 @@ METHODS = [
             'detector': 'cpainted',
             'descriptor': 'patchdescriptor',
             'patch_descriptor_name': 'sift',
-            "threshold": 0.01,
+            "threshold": 0.014,
         },
         'matcher_name': "NN",
         'preprocessing': {
@@ -166,28 +166,13 @@ METHODS = [
         },
     },
     {
-        "name": "cpainted",
+        "name": "cpainted+superpoint",
         'model': {
             'name': 'cpainted',
             'nms_radius': 3,
             'max_keypoints': 4096,
         },
         'matcher_name': "NN",
-        'preprocessing': {
-            'grayscale': True,
-            'resize_max': 1024,
-        },
-    },
-    {
-        "name": "cpainted+superpoint",
-        'model': {
-            'name': 'split',
-            'detector': 'cpainted',
-            'descriptor': 'superpoint',
-            'nms_radius': 3,
-            'max_keypoints': 4096,
-        },
-        'matcher_name': "superglue",
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1024,
