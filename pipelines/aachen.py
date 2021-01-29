@@ -31,6 +31,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
 
     # ## Extract local features for database and query images
     feature_path, avg_num_points = extract_features.main(feature_conf, images, run_dir, return_num_points=True)
+    print(f"Avg num points: {avg_num_points}")
 
     # The function returns the path of the file in which all the extracted features are stored.
 

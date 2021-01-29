@@ -200,12 +200,12 @@ class CPainted(BaseModel):
             l_pts = torch.stack((y, x), dim=1)
             l_scores = heatmap[i].squeeze()[l_pts[:, 0], l_pts[:, 1]]
             # localize to the subpixel
-            #  l_pts, sizes = subpixel.localize(heatmap[i], l_pts, 1)
+            l_pts, sizes = subpixel.localize(heatmap[i], l_pts, 1)
             flipped = torch.flip(l_pts, [1]).float()
 
-            l_sampled = sample_descriptors(
-                    desc[i].unsqueeze(0), H, W, l_pts.view(1, -1, 2), padding).squeeze(0).T
-            #  l_sampled = SP.sample_descriptors(flipped.view(1, -1, 2), descriptors[i][None], 8)[0]
+            #  l_sampled = sample_descriptors(
+            #          desc[i].unsqueeze(0), H, W, l_pts.view(1, -1, 2), padding).squeeze(0).T
+            l_sampled = SP.sample_descriptors(flipped.view(1, -1, 2), descriptors[i][None], 8)[0]
 
             pts.append(flipped) # (N, 2)
             scores.append(l_scores) # (N)

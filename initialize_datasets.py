@@ -1,6 +1,6 @@
-import aachen_generate_pairs
-from FourSeasons import prepare_pairs
-from RobotCar import robotcar_to_colmap, robotcar_generate_query_list
+from pipelines import aachen_generate_pairs
+from pipelines.FourSeasons import prepare_pairs
+from pipelines.RobotCar import robotcar_to_colmap, robotcar_generate_query_list
 from hloc import pairs_from_covisibility, pairs_from_retrieval, retrieval
 import argparse
 from pathlib import Path
