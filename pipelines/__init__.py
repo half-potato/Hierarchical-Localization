@@ -1,9 +1,15 @@
+import os
+import sys
+import shutil
+import datetime
+import json
+from pathlib import Path
+
 from . import aachen
 from . import FourSeasons
 from . import RobotCar
 from . import southbuilding
-import json
-from pathlib import Path
+
 from hloc.match_features import confs as MATCHER_CONFS
 
 PIPELINES = {
@@ -195,14 +201,27 @@ METHODS = [
     },
 ]
 
+def write_metadata(output_dir):
+    metadata_path = os.path.join(output_dir, "metadata")
+    os.makedirs(metadata_path, exist_ok=True)
+    os.system(f"git diff > {os.path.join(metadata_path, 'gitdiff')}")
+    os.system(f"git show --oneline -s > {os.path.join(metadata_path, 'gitlog')}")
+    with open(os.path.join(metadata_path, "meta"), "w") as f:
+        date = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        f.write(f"Run at: {date}\n")
+        f.write(f"With args: {' '.join(sys.argv)}\n")
+
+
 def gen_out_path(output_dir, pipeline_name):
     return output_dir / pipeline_name
 
-def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization):
+def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization, run_name=None):
+    write_metadata(str(gen_out_path(output_dir, pipeline_name) / run_name))
     base_dir = Path(base_dir)
     output_dir = Path(output_dir)
     # Set names
-    run_name = config["name"]
+    if run_name is None:
+        run_name = config["name"]
     #  config['output'] = f'feats-{run_name.replace("_", "-")}-n{config["model"]["max_keypoints"]}-r{config["model"]["preprocessing"]["resize_max"]}'
     config['output'] = f'feats-{run_name.replace("_", "-")}'
 

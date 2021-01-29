@@ -99,7 +99,6 @@ def main(conf, pairs, features, export_dir, exhaustive=False):
     match_name = f'{features}_{conf["output"]}_{pairs_name}'
     match_path = Path(export_dir, match_name+'.h5')
     match_file = h5py.File(str(match_path), 'a')
-    return match_path
 
     matched = set()
     for pair in tqdm(pair_list, smoothing=.1):
