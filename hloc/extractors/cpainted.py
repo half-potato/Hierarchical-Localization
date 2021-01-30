@@ -1,3 +1,4 @@
+import cv2
 import os
 import math
 import torch
@@ -9,6 +10,8 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent / '../../third_party'))
 import SuperGluePretrainedNetwork.models.superpoint as SP
+from cpaint.models import subpixel
+import matplotlib.pyplot as plt
 
 
 dii_filter = torch.tensor([
@@ -126,6 +129,7 @@ class SuperPointTrainable(SuperPointNet):
 
     def load_default_state_dict(self):
         path = self.config["checkpoint"]
+        path = Path(__file__).parent / Path(path)
         ckpt = torch.load(path)
         if "state_dict" in ckpt:
             state_dict = ckpt["state_dict"]
@@ -136,25 +140,25 @@ class SuperPointTrainable(SuperPointNet):
         self.load_state_dict(state_dict)
 
 class CPainted(BaseModel):
-    default_config = {
+    default_conf = {
+        #  "threshold": 0.004,
         "threshold": 0.03,
+        #  "threshold": 0.01,
         "maxpool_radius": 3,
         "remove_borders": 4,
-        "max_keypoints": 2048,
-        #  "checkpoint": "/app/outputs/checkpoints/no_forest_low_thres/models/checkpoint001.pth",
-        #  "checkpoint": "/app/outputs/checkpoints/run_9_24/models/checkpoint003.pth",
-        #  "checkpoint": "/app/outputs/checkpoints/run-8-20-unreal-blended_05/models/checkpoint005.pth",
-        #  "checkpoint": "/app/outputs/checkpoints/run-10-23-unreal-blended_10/models/checkpoint002.pth",
-        "checkpoint": "/app/outputs/checkpoints/run-11-10-unreal-blended_08/models/checkpoint005.pth",
+        "max_keypoints": 4096,
+        "checkpoint": "../../third_party/cpaint/checkpoints/third_sota_cpainted.pth",
+        #  "checkpoint": "../../third_party/cpaint/checkpoints/best_sota_cpainted.pth",
     }
     def _init(self, config):
-        self.config = {**self.default_config, **config}
+        self.config = config
         self.net = SuperPointTrainable(self.config)
         self.net.load_default_state_dict()
         self.desc_net = SP.SuperPoint(self.config)
 
     def _forward(self, data):
         x = data["image"]
+
         # Resize image such that it is a multiple of the cell size
         old_size = x.shape
         B, C, H, W = old_size
@@ -170,18 +174,16 @@ class CPainted(BaseModel):
         desc = result["raw_desc"]
         D = desc.shape[1]
         heatmap = unpad_multiple(heatmap, old_size, input_size_multiple)
+        #  g_heatmap = score_gaussian_peaks(heatmap)
 
         # remove border, apply nms + threshold
         # Shape: (3, N)
         mask1 = mask_border(heatmap, border=self.config["remove_borders"])
 #         mask2 = mask_max(heatmap, radius=self.config["maxpool_radius"])
 
-#         heatmap = score_gaussian_peaks(heatmap)
         mask2 = mask_max(heatmap, radius=self.config["maxpool_radius"])
 
         pooled = mask1 * mask2 * heatmap
-
-        # Compute descriptor
         _, descriptors = self.desc_net._forward(data)
 
         # torch where over batch
@@ -189,6 +191,7 @@ class CPainted(BaseModel):
         scores = []
         sampled = []
         for i in range(B):
+            # row col
             y, x = torch.where(pooled[i].squeeze() > self.config["threshold"])
             if len(y) > self.config["max_keypoints"]:
                 threshold, _ = torch.sort(pooled[i].flatten(), descending=True)
@@ -196,26 +199,44 @@ class CPainted(BaseModel):
                 y, x = torch.where(pooled[i].squeeze() > threshold)
             l_pts = torch.stack((y, x), dim=1)
             l_scores = heatmap[i].squeeze()[l_pts[:, 0], l_pts[:, 1]]
+            # localize to the subpixel
+            l_pts, sizes = subpixel.localize(heatmap[i], l_pts, 1)
             flipped = torch.flip(l_pts, [1]).float()
 
             #  l_sampled = sample_descriptors(
             #          desc[i].unsqueeze(0), H, W, l_pts.view(1, -1, 2), padding).squeeze(0).T
             l_sampled = SP.sample_descriptors(flipped.view(1, -1, 2), descriptors[i][None], 8)[0]
 
-            pts.append(flipped)
-            scores.append(l_scores)
-            sampled.append(l_sampled)
-        #  print(pts[0].shape)
-#         print(scores.shape)
-#         print(sampled.shape)
-#         torch.Size([2039, 2])
-#         torch.Size([2039])
-#         torch.Size([2039, 256])
+            pts.append(flipped) # (N, 2)
+            scores.append(l_scores) # (N)
+            sampled.append(l_sampled) # (256, N)
+
+            if False:
+                img = (data["image"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
+                # compute orientation
+                size = 4
+                # convert to keypoints
+                kpts = []
+                for pt in flipped.cpu():
+                    kpts.append(cv2.KeyPoint(float(pt[0]), float(pt[1]), _size=size, _angle=0))
+
+                print(len(kpts))
+                drawn = img.copy()
+                drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+                plt.figure()
+                plt.imshow(heatmap.squeeze().cpu())
+                plt.figure()
+                plt.imshow(g_heatmap.squeeze().cpu())
+                plt.figure()
+                plt.imshow(drawn)
+                plt.show()
 
         return {
             'keypoints': pts,
             'scores': scores,
             'descriptors': sampled,
+            "heatmap": heatmap
         }
 
 # Util for extracting features
@@ -240,14 +261,6 @@ def mask_max(score_map, radius=8):
         )
     mask = l_max == batch
     return mask.view(N, H, W)
-
-def score_gaussian_peaks(score_map):
-    batch = score_map.view(1, 1, score_map.shape[-2], score_map.shape[-1]).float()
-    batch = gf(batch)
-    dii = F.conv2d(batch, dii_filter, padding=1, dilation=1, stride=1)
-    djj = F.conv2d(batch, djj_filter, padding=1, dilation=1, stride=1)
-    score = torch.min(-dii, -djj)/2
-    return score
 
 
 def gaussian_filter(kernel_size, sigma, channels=1):
@@ -282,7 +295,15 @@ def gaussian_filter(kernel_size, sigma, channels=1):
     gaussian_filter.weight.requires_grad = False
     return gaussian_filter
 
-gf = gaussian_filter(3, 1).cuda()
+gf = gaussian_filter(5, 1).cuda()
+
+def score_gaussian_peaks(score_map):
+    batch = score_map.view(1, 1, score_map.shape[-2], score_map.shape[-1]).float()
+    batch = gf(batch)
+    dii = F.conv2d(batch, dii_filter, padding=1, dilation=1, stride=1)
+    djj = F.conv2d(batch, djj_filter, padding=1, dilation=1, stride=1)
+    score = torch.min(-dii, -djj)/2
+    return score
 
 def get_padding_for_multiple(imshape, multiple):
     N, C, H, W = imshape
@@ -327,5 +348,4 @@ def sample_descriptors(descriptor, H, W, pts, padding=[0,0,0,0], normalize=True)
     if normalize:
         descs = F.normalize(descs, p=2, dim=1)
     return descs.view(N, -1, M).transpose(1, 2)
-
 

@@ -116,7 +116,8 @@ METHODS = [
         'matcher_name': "L2",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
+            'resize_force': True,
         },
     },
     {
@@ -181,7 +182,8 @@ METHODS = [
         'matcher_name': "NN",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
+            'resize_force': True,
         },
     },
     {
@@ -216,12 +218,12 @@ def gen_out_path(output_dir, pipeline_name):
     return output_dir / pipeline_name
 
 def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization, run_name=None):
-    write_metadata(str(gen_out_path(output_dir, pipeline_name) / run_name))
     base_dir = Path(base_dir)
     output_dir = Path(output_dir)
     # Set names
     if run_name is None:
         run_name = config["name"]
+    write_metadata(str(gen_out_path(output_dir, pipeline_name) / run_name))
     #  config['output'] = f'feats-{run_name.replace("_", "-")}-n{config["model"]["max_keypoints"]}-r{config["model"]["preprocessing"]["resize_max"]}'
     config['output'] = f'feats-{run_name.replace("_", "-")}'
 
