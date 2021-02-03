@@ -15,6 +15,12 @@ FEATURES = {
     "orb": cv2.ORB_create(nfeatures=6000),
     #  "sift": cv2.SIFT(),
 }
+DIM = {
+    "fast": 128,
+    "orb": 128,
+    "brief": 128,
+    "sift": 128,
+}
 
 if hasattr(cv2, "xfeatures2d"):
     FEATURES["sift"] = cv2.xfeatures2d.SIFT_create()
@@ -67,13 +73,17 @@ class CVDetectors(BaseModel):
             for kp in kpts:
                 l_pts.append([kp.pt[0], kp.pt[1]])
                 l_scores.append(kp.response)
-            drawn = img.copy()
-            drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-            plt.imshow(drawn)
-            plt.show()
-            pts.append(torch.tensor(l_pts)) # (N, 2)
+            #  drawn = img.copy()
+            #  drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+            #  plt.imshow(drawn)
+            #  plt.show()
             scores.append(torch.tensor(l_scores)) # (N)
-            sampled.append(torch.tensor(desc.T)) # (256, N)
+            if desc is None:
+                pts.append(torch.empty((0, 2)))
+                sampled.append(torch.empty((DIM[self.config["cvdescriptor_name"]], 0)))
+            else:
+                pts.append(torch.tensor(l_pts)) # (N, 2)
+                sampled.append(torch.tensor(desc.T)) # (256, N)
 
         return {
             'keypoints': pts,

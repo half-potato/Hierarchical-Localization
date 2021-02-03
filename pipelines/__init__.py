@@ -179,7 +179,7 @@ METHODS = [
             'nms_radius': 3,
             'max_keypoints': 4096,
         },
-        'matcher_name': "NN",
+        'matcher_name': "superglue",
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
@@ -189,16 +189,15 @@ METHODS = [
     {
         'name': 'superpoint',
         'model': {
-            'name': 'split',
-            'detector': 'superpoint',
-            'descriptor': 'superpoint',
+            'name': 'superpoint',
             'nms_radius': 3,
             'max_keypoints': 4096,
         },
         'matcher_name': "superglue",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
+            'resize_force': True,
         },
     },
 ]

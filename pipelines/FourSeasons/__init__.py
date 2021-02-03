@@ -32,9 +32,11 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     ref_pairs = output_dir / f'pairs-db-dist{num_ref_pairs}.txt'
 
     # Extract, match, and triangulate the reference SfM model.
-    ffile = extract_features.main(feature_conf, ref_images, run_dir)
+    ffile, avg_num_points = extract_features.main(feature_conf, ref_images, run_dir, return_num_points=True)
+    print(f"Avg num points: {avg_num_points}")
     mfile = match_features.main(matcher_conf, ref_pairs, feature_conf['output'], run_dir)
     stats = triangulation.main(ref_sfm, ref_sfm_empty, ref_images, ref_pairs, ffile, mfile)
+    stats['avg_num_points'] = avg_num_points
 
     if run_localization:
         logs_paths = []
