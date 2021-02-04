@@ -86,6 +86,7 @@ METHODS = [
             'name': 'cvdetectors',
             'cvdetector_name': 'fast',
             'cvdescriptor_name': 'brief',
+            'max_keypoints': 4096,
         },
         'matcher_name': "HAMMING",
         'preprocessing': {
@@ -174,6 +175,20 @@ METHODS = [
     },
     {
         "name": "cpainted+superpoint",
+        'model': {
+            'name': 'cpainted',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+            'resize_force': True,
+        },
+    },
+    {
+        "name": "cpainted+superpoint+superglue",
         'model': {
             'name': 'cpainted',
             'nms_radius': 3,

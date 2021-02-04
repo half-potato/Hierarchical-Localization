@@ -11,7 +11,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 FEATURES = {
-    "fast": cv2.FastFeatureDetector_create(threshold=50),
+    "fast": cv2.FastFeatureDetector_create(threshold=30),
     "orb": cv2.ORB_create(nfeatures=6000),
     #  "sift": cv2.SIFT(),
 }
@@ -67,22 +67,26 @@ class CVDetectors(BaseModel):
         for img in x:
             img = (img.view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
             kpts = self.detector.detect(img, None)
-            kpts, desc = self.descriptor.compute(img, kpts)
             l_pts = []
-            l_scores = []
             for kp in kpts:
-                l_pts.append([kp.pt[0], kp.pt[1]])
-                l_scores.append(kp.response)
+                l_pts.append([kp.pt[0], kp.pt[1], kp.response])
+
+            l_pts = torch.tensor(l_pts)
+            if "max_keypoints" in self.config:
+                threshold = -torch.sort(-l_pts[:, 2])[min(self.config["max_keypoints"], len(l_pts)-1)]
+                l_pts = l_pts[torch.where(l_pts[:, 2]>threshold), :]
+                kpts = [kpt for kpt in kpts if kpt.response > threshold]
+
+            kpts, desc = self.descriptor.compute(img, kpts)
             #  drawn = img.copy()
             #  drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
             #  plt.imshow(drawn)
             #  plt.show()
-            scores.append(torch.tensor(l_scores)) # (N)
             if desc is None:
                 pts.append(torch.empty((0, 2)))
                 sampled.append(torch.empty((DIM[self.config["cvdescriptor_name"]], 0)))
             else:
-                pts.append(torch.tensor(l_pts)) # (N, 2)
+                pts.append(l_pts[:, :2]) # (N, 2)
                 sampled.append(torch.tensor(desc.T)) # (256, N)
 
         return {

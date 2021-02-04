@@ -42,6 +42,8 @@ class NearestNeighbor(BaseModel):
         matches0 = -torch.ones((b, n), dtype=torch.int64)
         scores0 = torch.zeros((b, n), dtype=torch.float)
         for i in range(b):
+            if desc0[i].shape[1] == 0 or desc1[i].shape[1] == 0:
+                continue
             if self.conf["do_mutual_check"]:
                 good = self.matcher.match(desc0[i].T, desc1[i].T)
             else:
