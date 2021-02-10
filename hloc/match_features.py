@@ -31,7 +31,7 @@ confs = {
         "covisibility_clustering": False,
     },
     'L2': {
-        'output': 'matches-NN-mutual-dist.7',
+        'output': 'matches-NN-mutual-dist',
         'model': {
             'name': 'cvmatcher',
             'mutual_check': True,
@@ -41,7 +41,7 @@ confs = {
         "covisibility_clustering": True,
     },
     'HAMMING': {
-        'output': 'matches-NN-mutual-dist.7',
+        'output': 'matches-NN-mutual-dist',
         'model': {
             'name': 'cvmatcher',
             'mutual_check': True,
@@ -55,7 +55,7 @@ confs = {
         'model': {
             'name': 'nearest_neighbor',
             'mutual_check': True,
-            'distance_threshold': None,
+            'distance_threshold': 0.7,
         },
         "covisibility_clustering": True,
     }
@@ -98,7 +98,22 @@ def main(conf, pairs, features, export_dir, exhaustive=False):
 
     match_name = f'{features}_{conf["output"]}_{pairs_name}'
     match_path = Path(export_dir, match_name+'.h5')
+    existing = match_path.exists()
     match_file = h5py.File(str(match_path), 'a')
+    if existing:
+        main.i = 0
+        def counter(name, obj):
+            if "/" not in name:
+                main.i += 1
+        print("Found existing match file, checking if we can skip computation")
+        match_file.visititems(counter)
+        if len(pair_list) == main.i:
+            print("Exact number found, skipping")
+            return match_path
+        if abs(len(pair_list) - main.i) < 2000:
+            print(f"Missing {len(pair_list) - main.i} images, skipping anyways")
+            return match_path
+        print(f"Can't skip, found {main.i} out of {len(pair_list)}")
 
     matched = set()
     for pair in tqdm(pair_list, smoothing=.1):

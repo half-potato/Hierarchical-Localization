@@ -27,7 +27,7 @@ def mutual_check(m0, m1):
 class NearestNeighbor(BaseModel):
     default_conf = {
         'ratio_threshold': None,
-        'distance_threshold': None,
+        'distance_threshold': 0.7,
         'do_mutual_check': True,
     }
     required_inputs = ['descriptors0', 'descriptors1']

@@ -28,13 +28,14 @@ if __name__ == "__main__":
 
     elif args.dataset == "RobotCar":
         print("Preparing RobotCar")
-        robotcar_dir = base_dir / "RobotCar"
+        name = "RobotCar"
+        robotcar_dir = base_dir / name
         robotcar_to_colmap.main(
             robotcar_dir / "3D-models/all-merged/all.nvm",
             robotcar_dir / "3D-models/overcast-reference.db",
-            output_dir / "robotcar" / "sfm_sift")
-        pairs_from_covisibility.main(output_dir / "robotcar" / "sfm_sift", "pairs/robotcar-pairs-db-covis20.txt", 20)
-        robotcar_generate_query_list.main(robotcar_dir, output_dir / "robotcar")
+            output_dir / name / "sfm_sift")
+        pairs_from_covisibility.main(output_dir / name / "sfm_sift", "pairs/robotcar-pairs-db-covis20.txt", 20)
+        robotcar_generate_query_list.main(robotcar_dir, output_dir / name)
 
     elif args.dataset == "inloc":
         print("Preparing InLoc")

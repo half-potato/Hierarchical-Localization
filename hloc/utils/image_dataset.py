@@ -24,6 +24,7 @@ class ImageDataset(torch.utils.data.Dataset):
         if len(self.paths) == 0:
             raise ValueError(f'Could not find any image in root: {root}.')
         self.paths = [i.relative_to(root) for i in self.paths]
+        self.paths.sort()
         logging.info(f'Found {len(self.paths)} images in root {root}.')
 
     def __getitem__(self, idx):

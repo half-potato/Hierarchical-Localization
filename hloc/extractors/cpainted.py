@@ -147,7 +147,8 @@ class CPainted(BaseModel):
         "maxpool_radius": 3,
         "remove_borders": 4,
         "max_keypoints": 4096,
-        "checkpoint": "../../third_party/cpaint/checkpoints/third_sota_cpainted.pth",
+        "checkpoint": "../../third_party/cpaint/checkpoints/fourth_sota_cpainted.pth",
+        #  "checkpoint": "../../third_party/cpaint/checkpoints/third_sota_cpainted.pth",
         #  "checkpoint": "../../third_party/cpaint/checkpoints/best_sota_cpainted.pth",
     }
     def _init(self, config):
@@ -155,6 +156,8 @@ class CPainted(BaseModel):
         self.net = SuperPointTrainable(self.config)
         self.net.load_default_state_dict()
         self.desc_net = SP.SuperPoint(self.config)
+        self.net.eval()
+        self.desc_net.eval()
 
     def _forward(self, data):
         x = data["image"]
@@ -197,10 +200,15 @@ class CPainted(BaseModel):
                 threshold, _ = torch.sort(pooled[i].flatten(), descending=True)
                 threshold = threshold[self.config["max_keypoints"]]
                 y, x = torch.where(pooled[i].squeeze() > threshold)
+            if len(y) < 10:
+                # Just extract something I guess
+                threshold, _ = torch.sort(pooled[i].flatten(), descending=True)
+                threshold = threshold[10]
+                y, x = torch.where(pooled[i].squeeze() > threshold)
             l_pts = torch.stack((y, x), dim=1)
             l_scores = heatmap[i].squeeze()[l_pts[:, 0], l_pts[:, 1]]
             # localize to the subpixel
-            l_pts, sizes = subpixel.localize(heatmap[i], l_pts, 1)
+            l_pts = subpixel.localize(heatmap[i], l_pts, 1)[:, :2]
             flipped = torch.flip(l_pts, [1]).float()
 
             #  l_sampled = sample_descriptors(
@@ -211,7 +219,7 @@ class CPainted(BaseModel):
             scores.append(l_scores) # (N)
             sampled.append(l_sampled) # (256, N)
 
-            if False:
+            if True:
                 img = (data["image"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
                 # compute orientation
                 size = 4
@@ -226,8 +234,6 @@ class CPainted(BaseModel):
 
                 plt.figure()
                 plt.imshow(heatmap.squeeze().cpu())
-                plt.figure()
-                plt.imshow(g_heatmap.squeeze().cpu())
                 plt.figure()
                 plt.imshow(drawn)
                 plt.show()

@@ -5,10 +5,11 @@ from pathlib import Path
 from pprint import pformat
 
 from hloc import extract_features, match_features
-from hloc import triangulation, localize_sfm, visualization, reconstruction
+from hloc import triangulation, localize_sfm, visualization, reconstruction, localize_inloc
 
 # # Pipeline for outdoor day-night visual localization
 
+'''
 def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False):
     # ## Setup
     # Here we declare the paths to the dataset, the reconstruction and
@@ -20,7 +21,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     #  run_name = 'run_24_super_desc'
     dname = "inloc"
     dataset = Path(base_dir) / "inloc"  # change this if your dataset is somewhere else
-    images = dataset
+    images = dataset / "cutouts_imageonly"
 
     sfm_pairs = output_dir / "inloc" / "pairs-retrieval.txt"
 
@@ -75,4 +76,27 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
             covisibility_clustering=matcher_conf["covisibility_clustering"])  # not required with SuperPoint+SuperGlue
         stats["logs_path"] = logs_path
 
+    return stats
+'''
+
+def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False):
+    # Fixed paths
+    dname = "inloc"
+    dataset = Path(base_dir) / "inloc"  # change this if your dataset is somewhere else
+    sfm_pairs = output_dir / "inloc" / "pairs-retrieval.txt"
+    loc_pairs = Path("pairs/inloc") / 'pairs-query-netvlad40.txt'  # top 40 retrieved by NetVLAD
+
+    # Output specific
+    run_dir = output_dir / f'{dname}/{run_name}'  # where everything will be saved
+    run_dir.mkdir(exist_ok=True, parents=True)
+
+    results_path = run_dir / f'{dname}_{run_name}_hloc_netvlad40.txt'  # the result file
+
+    feature_path, avg_num_points = extract_features.main(feature_conf, dataset, run_dir, return_num_points=True)
+
+    stats = {}
+    print(f"Avg num points: {avg_num_points}")
+    match_path = match_features.main(matcher_conf, loc_pairs, feature_conf['output'], run_dir)
+    stats['avg_num_points'] = avg_num_points
+    localize_inloc.main(dataset, loc_pairs, feature_path, match_path, results_path, skip_matches=20)  # skip database images with too few matches
     return stats

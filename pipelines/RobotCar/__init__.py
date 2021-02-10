@@ -14,14 +14,15 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     # localization outputs, and we choose the feature extractor and the
     # matcher. 
 
-    dataset = Path(base_dir) / 'RobotCar/'  # change this if your dataset is somewhere else
+    name = "RobotCar"
+    dataset = Path(base_dir) / name  # change this if your dataset is somewhere else
     images = dataset / 'images'
 
     pairs = Path('pairs/')
     sfm_pairs = pairs / 'robotcar-pairs-db-covis20.txt'  # top 20 most covisible in SIFT model
     loc_pairs = pairs / 'pairs-query-netvlad20-percam-perloc.txt'  # top 50 retrieved by NetVLAD
 
-    run_dir = output_dir / f'RobotCar/{run_name}'  # where everything will be saved
+    run_dir = output_dir / name / run_name  # where everything will be saved
     run_dir.mkdir(exist_ok=True, parents=True)
     reference_sfm = run_dir / f'sfm'  # the SfM model we will build
     results_path = run_dir / f'RobotCar_hloc_netvlad50.txt'  # the result file
@@ -39,7 +40,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
 
     stats = triangulation.main(
         reference_sfm,
-        output_dir / "RobotCar" / 'sfm_sift',
+        output_dir / name / 'sfm_sift',
         images,
         sfm_pairs,
         feature_path,

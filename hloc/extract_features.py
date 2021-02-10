@@ -116,6 +116,7 @@ confs = {
     },
 }
 
+img_extensions = [".png", ".jpg", ".jpeg"]
 
 @torch.no_grad()
 def main(conf, image_dir, export_dir, as_half=False, return_num_points=False):
@@ -131,9 +132,34 @@ def main(conf, image_dir, export_dir, as_half=False, return_num_points=False):
 
     feature_path = Path(export_dir, conf['output']+'.h5')
     feature_path.parent.mkdir(exist_ok=True, parents=True)
-    feature_file = h5py.File(str(feature_path), 'a')
 
-    total_num_points = 0
+    # First, check if the file has already been computed
+    existing = feature_path.exists()
+    feature_file = h5py.File(str(feature_path), 'a')
+    main.total_num_points = 0
+    if existing:
+        main.i = 0
+        def counter(name, obj):
+            if Path(name).suffix.lower() in img_extensions:
+                main.i += 1
+            if Path(name).name == "keypoints":
+                main.total_num_points += obj.shape[0]
+        print("Found existing feature file, checking if we can skip computation")
+        feature_file.visititems(counter)
+        if len(loader) == main.i:
+            print("Exact number found, skipping")
+            if return_num_points:
+                return feature_path, main.total_num_points / main.i
+            else:
+                return feature_path
+        if abs(len(loader) - main.i) < 2000:
+            print(f"Missing {len(loader) - main.i} images, skipping anyways")
+            if return_num_points:
+                return feature_path, main.total_num_points / main.i
+            else:
+                return feature_path
+
+
     for data in tqdm(loader):
         if data['name'][0] in feature_file:
             continue
@@ -146,7 +172,7 @@ def main(conf, image_dir, export_dir, as_half=False, return_num_points=False):
             size = np.array(data['image'].shape[-2:][::-1])
             scales = (original_size / size).astype(np.float32)
             pred['keypoints'] = (pred['keypoints'] + .5) * scales[None] - .5
-            total_num_points += pred['keypoints'].shape[0]
+            main.total_num_points += pred['keypoints'].shape[0]
 
         if as_half:
             for k in pred:
@@ -164,7 +190,7 @@ def main(conf, image_dir, export_dir, as_half=False, return_num_points=False):
     logging.info('Finished exporting features.')
 
     if return_num_points:
-        return feature_path, total_num_points/len(loader)
+        return feature_path, main.total_num_points/len(loader)
     else:
         return feature_path
 

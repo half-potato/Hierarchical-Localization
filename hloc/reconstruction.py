@@ -19,11 +19,12 @@ def create_empty_db(database_path):
     db.commit()
     db.close()
 
+img_extensions = [".png", ".jpg", ".jpeg"]
 
 def import_images(colmap_path, sfm_dir, image_dir, database_path,
                   single_camera=False):
     logging.info('Importing images into the database...')
-    images = list(image_dir.iterdir())
+    images = [p for p in image_dir.rglob("*") if p.is_file() and p.suffix.lower() in img_extensions]
     if len(images) == 0:
         raise IOError(f'No images found in {image_dir}.')
 

@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from . import aachen
+from . import inloc
 from . import FourSeasons
 from . import RobotCar
 from . import southbuilding
@@ -17,9 +18,24 @@ PIPELINES = {
     "aachen": aachen,
     "4Seasons": FourSeasons,
     "RobotCar": RobotCar,
+    "inloc": inloc,
 }
 
 METHODS = [
+    {
+        "name": "sift-noscale",
+        'model': {
+            'name': 'cvdetectors',
+            'cvdetector_name': 'sift',
+            'cvdescriptor_name': 'sift',
+            'allow_scale_in_desc': False
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+        },
+    },
     {
         "name": "sift+brief",
         'model': {
@@ -30,7 +46,7 @@ METHODS = [
         'matcher_name': "HAMMING",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
         },
     },
     {
@@ -41,12 +57,13 @@ METHODS = [
             'descriptor': 'cvdetectors',
             'cvdetector_name': 'fast',
             'cvdescriptor_name': 'brief',
-            "threshold": 0.01,
+            #  "threshold": 0.01,
         },
         'matcher_name': "HAMMING",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
+            'resize_force': True,
         },
     },
     {
@@ -57,12 +74,13 @@ METHODS = [
             'descriptor': 'cvdetectors',
             'cvdetector_name': 'orb',
             'cvdescriptor_name': 'orb',
-            "threshold": 0.01,
+            #  "threshold": 0.01,
         },
         'matcher_name': "HAMMING",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
+            'resize_force': True,
         },
     },
     {
@@ -70,14 +88,15 @@ METHODS = [
         'model': {
             'name': 'split',
             'detector': 'cpainted',
-            'descriptor': 'patchdescriptor',
-            'patch_descriptor_name': 'sift',
-            "threshold": 0.014,
+            'descriptor': 'cvdetectors',
+            'cvdetector_name': 'fast',
+            'cvdescriptor_name': 'sift',
         },
         'matcher_name': "NN",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
+            'resize_force': True,
         },
     },
     {
@@ -91,7 +110,7 @@ METHODS = [
         'matcher_name': "HAMMING",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
         },
     },
     {
@@ -104,7 +123,7 @@ METHODS = [
         'matcher_name': "HAMMING",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
         },
     },
     {
@@ -125,22 +144,24 @@ METHODS = [
         "name": "d2net",
         'model': {
             'name': 'd2net',
+            'multiscale': True,
         },
         'matcher_name': "NN",
         'preprocessing': {
             'grayscale': False,
-            'resize_max': 1024,
+            'resize_max': 1600,
         },
     },
     {
         "name": "r2d2",
         'model': {
             'name': 'r2d2',
+            'multiscale': True,
         },
         'matcher_name': "NN",
         'preprocessing': {
             'grayscale': False,
-            'resize_max': 1024,
+            'resize_max': 1600,
         },
     },
     {
@@ -148,14 +169,15 @@ METHODS = [
         'model': {
             'name': 'r2d2',
             'detector_name': 'cpainted',
-            'multiscale': False,
+            'multiscale': True,
             'nms_radius': 3,
             'max_keypoints': 4096,
         },
         'matcher_name': "NN",
         'preprocessing': {
-            'grayscale': True,
-            'resize_max': 1024,
+            'grayscale': False,
+            'resize_max': 1600,
+            'resize_force': True,
         },
     },
     {
@@ -163,14 +185,15 @@ METHODS = [
         'model': {
             'name': 'd2net_split',
             'detector_name': 'cpainted',
-            'multiscale': False,
+            'multiscale': True,
             'nms_radius': 3,
             'max_keypoints': 4096,
         },
         'matcher_name': "NN",
         'preprocessing': {
             'grayscale': True,
-            'resize_max': 1024,
+            'resize_max': 1600,
+            'resize_force': True,
         },
     },
     {

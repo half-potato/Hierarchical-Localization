@@ -14,12 +14,19 @@ FEATURES = {
     "fast": cv2.FastFeatureDetector_create(threshold=30),
     "orb": cv2.ORB_create(nfeatures=6000),
     #  "sift": cv2.SIFT(),
+    #  "sift-noscale": cv2.SIFT(nOctaveLayers=1),
 }
 DIM = {
     "fast": 128,
     "orb": 128,
     "brief": 128,
     "sift": 128,
+}
+
+DEFAULT_SIZE = {
+    "fast": 7,
+    "sift": 3,
+    "orb": 31,
 }
 
 if hasattr(cv2, "xfeatures2d"):
@@ -47,6 +54,8 @@ def compute_orientations(image, radius):
 
 class CVDetectors(BaseModel):
     default_conf = {
+        "allow_scale_in_desc": True,
+        "default_size": 15,
     }
     def _init(self, config):
         self.config = config
@@ -73,19 +82,36 @@ class CVDetectors(BaseModel):
 
             l_pts = torch.tensor(l_pts)
             if "max_keypoints" in self.config:
-                threshold = -torch.sort(-l_pts[:, 2])[min(self.config["max_keypoints"], len(l_pts)-1)]
-                l_pts = l_pts[torch.where(l_pts[:, 2]>threshold), :]
+                sorted_vals = -torch.sort(-l_pts[:, 2]).values
+                desired = min(self.config["max_keypoints"], len(l_pts)-1)
+                threshold = sorted_vals[desired]
+                inds, = torch.where(l_pts[:, 2]>threshold)
+                l_pts = l_pts[inds, :]
                 kpts = [kpt for kpt in kpts if kpt.response > threshold]
 
+            if not self.config["allow_scale_in_desc"]:
+                for kp in kpts:
+                    kp.size = DEFAULT_SIZE[self.config["cvdetector_name"]]
+                    # if sift, set octave to 0
+                    if self.config["cvdetector_name"] == "sift":
+                        #  octave = kp.octave & 255
+                        layer = (kp.octave >> 8) & 0xFF
+                        #  octave = octave if octave < 128 else (-128 | octave)
+                        kp.octave = (layer << 8)
+
+            #  print(sizes)
             kpts, desc = self.descriptor.compute(img, kpts)
             #  drawn = img.copy()
             #  drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
             #  plt.imshow(drawn)
             #  plt.show()
             if desc is None:
+                print(f"No points found for image: {data['name']}")
                 pts.append(torch.empty((0, 2)))
+                scores.append(torch.empty((0)))
                 sampled.append(torch.empty((DIM[self.config["cvdescriptor_name"]], 0)))
             else:
+                scores.append(l_pts[:, 2].squeeze())
                 pts.append(l_pts[:, :2]) # (N, 2)
                 sampled.append(torch.tensor(desc.T)) # (256, N)
 
@@ -117,12 +143,12 @@ class CVDetectors(BaseModel):
             for (pt, s) in zip(pts, ss):
                 kpts.append(cv2.KeyPoint(pt[0], pt[1], _size=size, _angle=orientations[int(pt[1]), int(pt[0])]))
 
-            drawn = img.copy()
-            drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-            plt.figure()
-            plt.imshow(drawn)
-            plt.show()
+            #  drawn = img.copy()
+            #  drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+            #
+            #  plt.figure()
+            #  plt.imshow(drawn)
+            #  plt.show()
 
             kpts, desc = self.descriptor.compute(img, kpts)
             l_pts = []
@@ -130,9 +156,15 @@ class CVDetectors(BaseModel):
             for kp in kpts:
                 l_pts.append([int(kp.pt[0]+0.5), int(kp.pt[1]+0.5)])
                 l_scores.append(kp.response)
-            points.append(torch.tensor(l_pts)) # (N, 2)
-            scores.append(torch.tensor(l_scores)) # (N)
-            sampled.append(torch.tensor(desc.T)) # (32, N)
+            if desc is None:
+                print(f"No points found for image: {data['name']}. {pts.shape}")
+                points.append(torch.empty((0, 2)))
+                scores.append(torch.empty((0)))
+                sampled.append(torch.empty((DIM[self.config["cvdescriptor_name"]], 0)))
+            else:
+                points.append(torch.tensor(l_pts)) # (N, 2)
+                scores.append(torch.tensor(l_scores)) # (N)
+                sampled.append(torch.tensor(desc.T)) # (32, N)
 
         return {
             'keypoints': points,
