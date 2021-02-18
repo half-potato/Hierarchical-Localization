@@ -12,7 +12,7 @@ from .utils import get_timestamps, delete_unused_images
 from .utils import generate_query_lists, generate_localization_pairs
 from .utils import prepare_submission, evaluate_submission
 
-def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False):
+def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False, skip_reconstruction=False):
 
     # Setup path to dataset
     ref_dir = base_dir / "4Seasons" / 'reference'
@@ -35,7 +35,10 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     ffile, avg_num_points = extract_features.main(feature_conf, ref_images, run_dir, return_num_points=True)
     print(f"Avg num points: {avg_num_points}")
     mfile = match_features.main(matcher_conf, ref_pairs, feature_conf['output'], run_dir)
-    stats = triangulation.main(ref_sfm, ref_sfm_empty, ref_images, ref_pairs, ffile, mfile)
+    if not skip_reconstruction:
+        stats = triangulation.main(ref_sfm, ref_sfm_empty, ref_images, ref_pairs, ffile, mfile)
+    else:
+        stats = {}
     stats['avg_num_points'] = avg_num_points
 
     if run_localization:

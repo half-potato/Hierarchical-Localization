@@ -147,17 +147,22 @@ def main(conf, image_dir, export_dir, as_half=False, return_num_points=False):
         print("Found existing feature file, checking if we can skip computation")
         feature_file.visititems(counter)
         if len(loader) == main.i:
-            print("Exact number found, skipping")
+            print(f"Exact number {main.i} found, skipping")
             if return_num_points:
+                feature_file.close()
                 return feature_path, main.total_num_points / main.i
             else:
+                feature_file.close()
                 return feature_path
-        if abs(len(loader) - main.i) < 2000:
+        if abs(len(loader) - main.i) < len(loader)//8:
             print(f"Missing {len(loader) - main.i} images, skipping anyways")
             if return_num_points:
+                feature_file.close()
                 return feature_path, main.total_num_points / main.i
             else:
+                feature_file.close()
                 return feature_path
+        print(f"Missing {len(loader) - main.i} images, proceeding to computation")
 
 
     for data in tqdm(loader):

@@ -8,7 +8,7 @@ from hloc import extract_features, match_features, pairs_from_covisibility
 from hloc import colmap_from_nvm, triangulation, visualization
 from . import localize
 
-def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False):
+def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False, skip_reconstruction=False):
     # ## Setup
     # Here we declare the paths to the dataset, the reconstruction and
     # localization outputs, and we choose the feature extractor and the
@@ -38,14 +38,17 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     # We triangulate the sparse 3D pointcloud given the matches and the
     # reference poses stored in the SIFT COLMAP model.
 
-    stats = triangulation.main(
-        reference_sfm,
-        output_dir / name / 'sfm_sift',
-        images,
-        sfm_pairs,
-        feature_path,
-        sfm_match_path,
-        colmap_path='colmap')  # change if COLMAP is not in your PATH
+    if not skip_reconstruction:
+        stats = triangulation.main(
+            reference_sfm,
+            output_dir / name / 'sfm_sift',
+            images,
+            sfm_pairs,
+            feature_path,
+            sfm_match_path,
+            colmap_path='colmap')  # change if COLMAP is not in your PATH
+    else:
+        stats = {}
     stats['avg_num_points'] = avg_num_points
 
     if run_localization:
@@ -59,8 +62,8 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
         # ## Localize!
         logs_path = localize.main(
             reference_sfm / "model",
-            "outputs/*_queries_with_intrinsics.txt",
-            "pairs/pairs-query-netvlad20-percam-perloc.txt",
+            output_dir / name / "*_queries_with_intrinsics.txt",
+            Path("pairs/pairs-query-netvlad20-percam-perloc.txt"),
             feature_path,
             loc_match_path,
             results_path,

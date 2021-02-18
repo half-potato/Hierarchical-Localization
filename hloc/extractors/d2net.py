@@ -26,10 +26,12 @@ class D2Net(BaseModel):
         'model_name': 'd2_tf.pth',
         'use_relu': True,
         'multiscale': True,
+        "max_keypoints": 2048,
     }
     required_inputs = ['image']
 
     def _init(self, conf):
+        self.config = conf
         model_file = d2net_path / 'models' / conf['model_name']
         if not model_file.exists():
             model_file.parent.mkdir(exist_ok=True)
@@ -58,6 +60,13 @@ class D2Net(BaseModel):
         else:
             keypoints, scores, descriptors = process_multiscale(
                 image, self.net, scales=[1])
+        # cap keypoints
+        if len(scores.shape) > self.config["max_keypoints"]:
+            threshold, _ = torch.sort(scores, descending=True)
+            threshold = threshold[self.config["max_keypoints"]]
+            i = torch.where(scores > threshold)
+            keypoints = keypoints[i, :]
+            scores = scores[i]
         keypoints = keypoints[:, [1, 0]]  # (x, y) and remove the scale
 
         return {

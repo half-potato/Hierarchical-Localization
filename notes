@@ -1,0 +1,105 @@
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_330_30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/024/DUC_cutout_024_0_0.jpg
+
+  0%|                                                                                                                                                                                      | 0/14240 [00:00<?, ?it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/024/DUC_cutout_024_0_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3858) torch.Size([1, 3848])
+  0%|                                                                                                                                                                           | 1/14240 [00:03<12:44:02,  3.22s/it]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/022/DUC_cutout_022_120_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3878) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/024/DUC_cutout_024_330_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3956) torch.Size([1, 3848])
+  0%|                                                                                                                                                                            | 3/14240 [00:03<4:10:35,  1.06s/it]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/024/DUC_cutout_024_0_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3667) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_300_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3928) torch.Size([1, 3848])
+  0%|                                                                                                                                                                            | 5/14240 [00:03<2:30:41,  1.57it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/024/DUC_cutout_024_330_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3853) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_270_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3714) torch.Size([1, 3848])
+  0%|                                                                                                                                                                            | 7/14240 [00:03<1:47:29,  2.21it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/022/DUC_cutout_022_150_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3685) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/021/DUC_cutout_021_240_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3881) torch.Size([1, 3848])
+  0%|1                                                                                                                                                                           | 9/14240 [00:03<1:23:46,  2.83it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_270_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3432) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/021/DUC_cutout_021_210_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3596) torch.Size([1, 3848])(1, 32, 3848) (1, 32, 3596) torch.Size([1, 3848])
+  0%|1                                                                                                                                                                          | 11/14240 [00:04<1:09:08,  3.43it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_330_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3645) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/022/DUC_cutout_022_150_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3800) torch.Size([1, 3848])
+  0%|1                                                                                                                                                                            | 13/14240 [00:04<59:02,  4.02it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/022/DUC_cutout_022_120_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3531) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/021/DUC_cutout_021_210_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3735) torch.Size([1, 3848])
+  0%|1                                                                                                                                                                            | 15/14240 [00:04<51:33,  4.60it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_330_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3778) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/024/DUC_cutout_024_30_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3695) torch.Size([1, 3848])
+  0%|2                                                                                                                                                                            | 17/14240 [00:04<46:21,  5.11it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/024/DUC_cutout_024_30_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3471) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_0_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3760) torch.Size([1, 3848])
+  0%|2                                                                                                                                                                            | 19/14240 [00:04<42:12,  5.61it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_300_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3258) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/024/DUC_cutout_024_330_30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3544) torch.Size([1, 3848])
+  0%|2                                                                                                                                                                            | 21/14240 [00:04<38:21,  6.18it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/021/DUC_cutout_021_270_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3904) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/022/DUC_cutout_022_90_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3330) torch.Size([1, 3848])
+  0%|2                                                                                                                                                                            | 23/14240 [00:04<35:24,  6.69it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/021/DUC_cutout_021_240_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3528) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_330_30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3683) torch.Size([1, 3848])
+  0%|3                                                                                                                                                                            | 25/14240 [00:05<33:40,  7.03it/s$(1, 32, 3848) (1, 32, 3683) torch.Size([1, 3848])                                                                                                                                                           [40/1825]
+  0%|3                                                                                                                                                                            | 25/14240 [00:05<33:40,  7.03it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_0_30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3445) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/022/DUC_cutout_022_150_30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3519) torch.Size([1, 3848])
+  0%|3                                                                                                                                                                            | 27/14240 [00:05<31:26,  7.53it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/022/DUC_cutout_022_90_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3346) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/016/DUC_cutout_016_60_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3373) torch.Size([1, 3848])
+  0%|3                                                                                                                                                                            | 29/14240 [00:05<29:29,  8.03it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_240_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3459) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/089/DUC_cutout_089_120_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 2504) torch.Size([1, 3848])
+  0%|3                                                                                                                                                                            | 31/14240 [00:05<27:31,  8.60it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/019/DUC_cutout_019_0_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3721) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/017/DUC_cutout_017_210_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3798) torch.Size([1, 3848])
+  0%|4                                                                                                                                                                            | 33/14240 [00:05<26:20,  8.99it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/022/DUC_cutout_022_60_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3511) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/024/DUC_cutout_024_300_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3726) torch.Size([1, 3848])
+  0%|4                                                                                                                                                                            | 35/14240 [00:05<25:53,  9.14it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/023/DUC_cutout_023_300_30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3860) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/003/DUC_cutout_003_30_-30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3467) torch.Size([1, 3848])
+  0%|4                                                                                                                                                                            | 37/14240 [00:06<25:00,  9.47it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/020/DUC_cutout_020_90_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3812) torch.Size([1, 3848])
+query/iphone7/IMG_0801.JPG database/cutouts/DUC1/021/DUC_cutout_021_210_30.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 2267) torch.Size([1, 3848])
+  0%|4                                                                                                                                                                            | 39/14240 [00:06<25:52,  9.14it/s]
+query/iphone7/IMG_0801.JPG database/cutouts/DUC2/113/DUC_cutout_113_240_0.jpg outputs/inloc/fast+brief/feats-fast+brief.h5
+(1, 32, 3848) (1, 32, 3723) torch.Size([1, 3848])

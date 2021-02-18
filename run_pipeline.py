@@ -9,6 +9,7 @@ if __name__ == '__main__':
     parser.add_argument("--base_dir", type=Path, default="datasets", help='Path to directory containing all datasets')
     parser.add_argument("--output_dir", type=Path, default="outputs", help='Path to directory to store results')
     parser.add_argument("--run_name", type=str, default=None, help='Name the run')
+    parser.add_argument("--skip_reconstruction", default=False, action="store_true", help='Assume reconstruction has already been done')
     parser.add_argument("--run_localization", default=False, action="store_true",
                         help='Whether to run the localization necessary to submit a benchmark to visuallocalization.net')
     args = parser.parse_args()
@@ -24,4 +25,4 @@ if __name__ == '__main__':
     for pipeline_name in to_run:
         for config in methods:
             print(f"Running {config['name']} on {pipeline_name}")
-            pipelines.run_pipeline(args.base_dir, args.output_dir, pipeline_name, config, run_localization=args.run_localization, run_name=args.run_name)
+            pipelines.run_pipeline(args.base_dir, args.output_dir, pipeline_name, config, run_localization=args.run_localization, run_name=args.run_name, skip_reconstruction=args.skip_reconstruction)

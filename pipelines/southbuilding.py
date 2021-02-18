@@ -9,7 +9,7 @@ from hloc import triangulation, localize_sfm, visualization, reconstruction
 
 # # Pipeline for outdoor day-night visual localization
 
-def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False):
+def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False, skip_reconstruction=False):
     # ## Setup
     # Here we declare the paths to the dataset, the reconstruction and
     # localization outputs, and we choose the feature extractor and the
@@ -44,7 +44,8 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     # We triangulate the sparse 3D pointcloud given the matches and the
     # reference poses stored in the SIFT COLMAP model.
 
-    stats = reconstruction.main(reference_sfm, images, sfm_pairs, feature_path, sfm_match_path)
+    if not skip_reconstruction:
+        stats = reconstruction.main(reference_sfm, images, sfm_pairs, feature_path, sfm_match_path)
     stats['avg_num_points'] = avg_num_points
 
     if run_localization:

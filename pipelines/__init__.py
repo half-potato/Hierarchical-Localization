@@ -197,6 +197,36 @@ METHODS = [
         },
     },
     {
+        "name": "cpainted+superpoint+superglue+nosubpix",
+        'model': {
+            'name': 'cpainted',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+            "subpixel": False,
+        },
+        'matcher_name': "superglue",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+            'resize_force': True,
+        },
+    },
+    {
+        "name": "cpainted+superpoint+nosubpix",
+        'model': {
+            'name': 'cpainted',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+            "subpixel": False,
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+            'resize_force': True,
+        },
+    },
+    {
         "name": "cpainted+superpoint",
         'model': {
             'name': 'cpainted',
@@ -218,6 +248,20 @@ METHODS = [
             'max_keypoints': 4096,
         },
         'matcher_name': "superglue",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+            'resize_force': True,
+        },
+    },
+    {
+        'name': 'superpoint-nn',
+        'model': {
+            'name': 'superpoint',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+        },
+        'matcher_name': "NN",
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
@@ -254,7 +298,7 @@ def write_metadata(output_dir):
 def gen_out_path(output_dir, pipeline_name):
     return output_dir / pipeline_name
 
-def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization, run_name=None):
+def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization, run_name=None, skip_reconstruction=False):
     base_dir = Path(base_dir)
     output_dir = Path(output_dir)
     # Set names
@@ -267,7 +311,7 @@ def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization, 
     # Run pipeline
     matcher_conf = MATCHER_CONFS[config["matcher_name"]]
     pipeline = PIPELINES[pipeline_name]
-    stats = pipeline.run_test(base_dir, output_dir, config, matcher_conf, run_name, run_localization=run_localization)
+    stats = pipeline.run_test(base_dir, output_dir, config, matcher_conf, run_name, run_localization=run_localization, skip_reconstruction=skip_reconstruction)
 
     # Save results
     out_path = gen_out_path(output_dir, pipeline_name) / f"{run_name}.json"

@@ -52,6 +52,13 @@ def compute_orientations(image, radius):
     angle[torch.isnan(angle)] = 0
     return angle.squeeze().cpu().numpy() * 180 / math.pi
 
+def kpts_to_tensor(kpts):
+    l_pts = []
+    for kp in kpts:
+        l_pts.append([kp.pt[0], kp.pt[1], kp.response])
+
+    l_pts = torch.tensor(l_pts)
+
 class CVDetectors(BaseModel):
     default_conf = {
         "allow_scale_in_desc": True,
@@ -76,12 +83,10 @@ class CVDetectors(BaseModel):
         for img in x:
             img = (img.view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
             kpts = self.detector.detect(img, None)
-            l_pts = []
-            for kp in kpts:
-                l_pts.append([kp.pt[0], kp.pt[1], kp.response])
+            l_pts = kpts_to_tensor(kpts)
 
             l_pts = torch.tensor(l_pts)
-            if "max_keypoints" in self.config:
+            if "max_keypoints" in self.config and l_pts.shape[0] > 0:
                 sorted_vals = -torch.sort(-l_pts[:, 2]).values
                 desired = min(self.config["max_keypoints"], len(l_pts)-1)
                 threshold = sorted_vals[desired]
@@ -105,6 +110,8 @@ class CVDetectors(BaseModel):
             #  drawn = cv2.drawKeypoints(img, kpts, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
             #  plt.imshow(drawn)
             #  plt.show()
+            l_pts = kpts_to_tensor(kpts)
+
             if desc is None:
                 print(f"No points found for image: {data['name']}")
                 pts.append(torch.empty((0, 2)))

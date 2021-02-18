@@ -142,12 +142,13 @@ class SuperPointTrainable(SuperPointNet):
 class CPainted(BaseModel):
     default_conf = {
         #  "threshold": 0.004,
-        "threshold": 0.03,
+        "threshold": 0.02,
         #  "threshold": 0.01,
         "maxpool_radius": 3,
         "remove_borders": 4,
         "max_keypoints": 4096,
-        "checkpoint": "../../third_party/cpaint/checkpoints/fourth_sota_cpainted.pth",
+        "subpixel": True,
+        "checkpoint": "../../third_party/cpaint/checkpoints/fifth_sota_cpainted.pth",
         #  "checkpoint": "../../third_party/cpaint/checkpoints/third_sota_cpainted.pth",
         #  "checkpoint": "../../third_party/cpaint/checkpoints/best_sota_cpainted.pth",
     }
@@ -208,7 +209,8 @@ class CPainted(BaseModel):
             l_pts = torch.stack((y, x), dim=1)
             l_scores = heatmap[i].squeeze()[l_pts[:, 0], l_pts[:, 1]]
             # localize to the subpixel
-            l_pts = subpixel.localize(heatmap[i], l_pts, 1)[:, :2]
+            if self.config["subpixel"]:
+                l_pts = subpixel.localize(heatmap[i], l_pts, 1)[:, :2]
             flipped = torch.flip(l_pts, [1]).float()
 
             #  l_sampled = sample_descriptors(
@@ -219,7 +221,7 @@ class CPainted(BaseModel):
             scores.append(l_scores) # (N)
             sampled.append(l_sampled) # (256, N)
 
-            if True:
+            if False:
                 img = (data["image"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
                 # compute orientation
                 size = 4

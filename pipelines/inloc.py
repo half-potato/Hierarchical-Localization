@@ -79,7 +79,7 @@ def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_loc
     return stats
 '''
 
-def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False):
+def run_test(base_dir, output_dir, feature_conf, matcher_conf, run_name, run_localization=False, skip_reconstruction=False):
     # Fixed paths
     dname = "inloc"
     dataset = Path(base_dir) / "inloc"  # change this if your dataset is somewhere else

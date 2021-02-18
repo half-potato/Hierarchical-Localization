@@ -61,6 +61,7 @@ confs = {
     }
 }
 
+img_extensions = [".png", ".jpg", ".jpeg"]
 
 @torch.no_grad()
 def main(conf, pairs, features, export_dir, exhaustive=False):
@@ -101,19 +102,30 @@ def main(conf, pairs, features, export_dir, exhaustive=False):
     existing = match_path.exists()
     match_file = h5py.File(str(match_path), 'a')
     if existing:
-        main.i = 0
+        main.matches = set()
         def counter(name, obj):
-            if "/" not in name:
-                main.i += 1
+            if Path(name).suffix.lower() in img_extensions:
+                #  matches.append(name)
+                main.matches |= {name}
         print("Found existing match file, checking if we can skip computation")
         match_file.visititems(counter)
-        if len(pair_list) == main.i:
-            print("Exact number found, skipping")
+        #  matches = set(matches)
+        # First, calculate number of unique pairs
+        failed = False
+        for pair in tqdm(pair_list, smoothing=.1):
+            name0, name1 = pair.split(' ')
+            pair1 = names_to_pair(name0, name1)
+            pair2 = names_to_pair(name1, name0)
+            if (pair1 not in main.matches) and (pair2 not in main.matches):
+                failed = True
+                break
+        if not failed:
+            print("All matches found")
+            match_file.close()
+            feature_file.close()
             return match_path
-        if abs(len(pair_list) - main.i) < 2000:
-            print(f"Missing {len(pair_list) - main.i} images, skipping anyways")
-            return match_path
-        print(f"Can't skip, found {main.i} out of {len(pair_list)}")
+        else:
+            print(f"Can't skip, missing {name0}, {name1}")
 
     matched = set()
     for pair in tqdm(pair_list, smoothing=.1):
