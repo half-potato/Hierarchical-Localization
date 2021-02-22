@@ -6,6 +6,22 @@ import argparse
 from pathlib import Path
 import subprocess
 
+def init_sfm(base_dir, dname, path_name=None):
+    if path_name is None:
+        path_name = dname
+    print(f"Preparing {dname}")
+    # Download dataset if it does not exist
+    # Run image retrieval to generate pairs
+    outdir = output_dir / path_name
+    sfm_pairs = outdir / "pairs-retrieval.txt"
+    desc_path = retrieval.main(
+            retrieval.confs["openibl"],
+            base_dir / path_name / "images",
+            outdir,
+            "openibl-gdesc-4096.h5")
+    pairs_from_retrieval.main(desc_path, sfm_pairs, 40, db_prefix="", query_prefix="")
+    print(f"Saved pairs to {sfm_pairs}")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--base_dir', type=Path, default='datasets',
@@ -84,4 +100,4 @@ if __name__ == "__main__":
         pairs_from_retrieval.main(desc_path, sfm_pairs, 40, db_prefix="P", query_prefix="P")
         print(f"Saved pairs to {sfm_pairs}")
     else:
-        print("Dataset not found")
+        init_sfm(base_dir, args.dataset)

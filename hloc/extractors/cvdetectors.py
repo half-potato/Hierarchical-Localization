@@ -58,6 +58,7 @@ def kpts_to_tensor(kpts):
         l_pts.append([kp.pt[0], kp.pt[1], kp.response])
 
     l_pts = torch.tensor(l_pts)
+    return l_pts
 
 class CVDetectors(BaseModel):
     default_conf = {

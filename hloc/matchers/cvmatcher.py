@@ -53,29 +53,30 @@ class NearestNeighbor(BaseModel):
                 for m,n in matches:
                     if m.distance < self.conf["ratio_threshold"]*n.distance:
                         good.append(m)
-            #  B, C, H, W = data["image0"].shape
-            #  size = 31
-            #  kpts0 = []
-            #  for pt in data["keypoints0"][i]:
-            #      kpts0.append(cv2.KeyPoint(float(pt[0]-0.5), float(pt[1]-0.5), _size=size))
-            #  kpts1 = []
-            #  for pt in data["keypoints1"][i]:
-            #      kpts1.append(cv2.KeyPoint(float(pt[0]-0.5), float(pt[1]-0.5), _size=size))
-            #  img = (data["image0"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
-            #  drawn = img.copy()
-            #  drawn = cv2.drawKeypoints(img, kpts1, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-            #  plt.imshow(drawn)
-            #  plt.show()
-            #  drawn = cv2.drawMatches(
-            #          (data["image0"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8),
-            #          kpts0,
-            #          (data["image1"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8),
-            #          kpts1,
-            #          good,
-            #          None,
-            #          flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-            #  plt.imshow(drawn)
-            #  plt.show()
+            if False:
+                B, C, H, W = data["image0"].shape
+                size = 31
+                kpts0 = []
+                for pt in data["keypoints0"][i]:
+                    kpts0.append(cv2.KeyPoint(float(pt[0]-0.5), float(pt[1]-0.5), _size=size))
+                kpts1 = []
+                for pt in data["keypoints1"][i]:
+                    kpts1.append(cv2.KeyPoint(float(pt[0]-0.5), float(pt[1]-0.5), _size=size))
+                img = (data["image0"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8)
+                drawn = img.copy()
+                drawn = cv2.drawKeypoints(img, kpts1, drawn, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+                plt.imshow(drawn)
+                plt.show()
+                drawn = cv2.drawMatches(
+                        (data["image0"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8),
+                        kpts0,
+                        (data["image1"][i].view(H, W, 1).cpu().numpy()*255).astype(np.uint8),
+                        kpts1,
+                        good,
+                        None,
+                        flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+                plt.imshow(drawn)
+                plt.show()
             for match in good:
                 matches0[i, match.queryIdx] = match.trainIdx
                 scores0[i, match.queryIdx] = match.distance

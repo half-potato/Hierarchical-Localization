@@ -142,7 +142,7 @@ class SuperPointTrainable(SuperPointNet):
 class CPainted(BaseModel):
     default_conf = {
         #  "threshold": 0.004,
-        "threshold": 0.02,
+        "threshold": 0.025,
         #  "threshold": 0.01,
         "maxpool_radius": 3,
         "remove_borders": 4,

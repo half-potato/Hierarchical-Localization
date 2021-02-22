@@ -10,11 +10,15 @@ from . import inloc
 from . import FourSeasons
 from . import RobotCar
 from . import southbuilding
+from . import sfm
 
 from hloc.match_features import confs as MATCHER_CONFS
 
 PIPELINES = {
-    "southbuilding": southbuilding,
+    "southbuilding": sfm.create_test("southbuilding", "South-Building"),
+    "alamo": sfm.create_test("alamo"),
+    "toweroflondon": sfm.create_test("toweroflondon"),
+    "romanforum": sfm.create_test("romanforum"),
     "aachen": aachen,
     "4Seasons": FourSeasons,
     "RobotCar": RobotCar,
@@ -22,6 +26,23 @@ PIPELINES = {
 }
 
 METHODS = [
+    {
+        "name": "sift-hardnet",
+        'model': {
+            'name': 'split',
+            'cvdetector_name': 'sift',
+            'cvdescriptor_name': 'sift',
+            'detector': 'cvdetectors',
+            'descriptor': 'hardnet',
+            'max_keypoints': 4096,
+            'allow_scale_in_desc': False
+        },
+        'matcher_name': "NN",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+        },
+    },
     {
         "name": "sift-noscale",
         'model': {
@@ -197,6 +218,24 @@ METHODS = [
         },
     },
     {
+        "name": "cpainted+hardnet",
+        'model': {
+            'name': 'split',
+            'detector': 'cpainted',
+            'descriptor': 'hardnet',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+            "subpixel": False,
+        },
+        'matcher_name': "L2",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+            'resize_force': True,
+        },
+    },
+    {
+        # this one is good
         "name": "cpainted+superpoint+superglue+nosubpix",
         'model': {
             'name': 'cpainted',
@@ -212,6 +251,7 @@ METHODS = [
         },
     },
     {
+        # not as good as subpixel
         "name": "cpainted+superpoint+nosubpix",
         'model': {
             'name': 'cpainted',
@@ -227,6 +267,7 @@ METHODS = [
         },
     },
     {
+        # this one is good
         "name": "cpainted+superpoint",
         'model': {
             'name': 'cpainted',
@@ -241,6 +282,7 @@ METHODS = [
         },
     },
     {
+        # not as good as no subpixel
         "name": "cpainted+superpoint+superglue",
         'model': {
             'name': 'cpainted',
