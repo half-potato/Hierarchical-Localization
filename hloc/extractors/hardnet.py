@@ -62,8 +62,11 @@ class HardNet(BaseModel):
             patches = []
             for pt in pts:
                 patches.append(extract_patch(images[i].unsqueeze(0), pt))
-            patches = torch.stack(patches)
-            desc = self.net(patches.reshape(-1, 1, self.ws, self.ws))
+            if not patches:
+                desc = torch.empty((0, 128))
+            else:
+                patches = torch.stack(patches)
+                desc = self.net(patches.reshape(-1, 1, self.ws, self.ws))
             # B, 128
 
             descs.append(desc.T)

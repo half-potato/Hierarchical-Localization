@@ -21,7 +21,7 @@ def main(descriptors, output, num_matched,
         if isinstance(obj, h5py.Dataset) else None)
     h5_names = list(set(h5_names))
 
-    if db_prefix:
+    if db_prefix or db_prefix == "":
         if not isinstance(db_prefix, str):
             db_prefix = tuple(db_prefix)
         db_names = [n for n in h5_names if n.startswith(db_prefix)]
@@ -36,7 +36,7 @@ def main(descriptors, output, num_matched,
         raise ValueError('Provide either prefixes of DB names, or path to '
                          'lists of DB images, or path to a COLMAP model.')
 
-    if query_prefix:
+    if query_prefix or query_prefix == "":
         if not isinstance(query_prefix, str):
             query_prefix = tuple(query_prefix)
         query_names = [n for n in h5_names if n.startswith(query_prefix)]

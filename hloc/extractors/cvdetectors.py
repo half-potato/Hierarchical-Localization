@@ -10,10 +10,35 @@ import sys
 from pathlib import Path
 import matplotlib.pyplot as plt
 
+class RootSIFT:
+    # from: https://github.com/jrosebr1/imutils
+    # The MIT License (MIT)
+    # Copyright (c) 2015-2016 Adrian Rosebrock, http://www.pyimagesearch.com
+    def __init__(self):
+        # initialize the SIFT feature extractor for OpenCV 2.4
+        self.extractor = cv2.xfeatures2d.SIFT_create()
+        self.detect = self.extractor.detect
+
+    def compute(self, image, kps, eps=1e-7):
+        # compute SIFT descriptors
+        (kps, descs) = self.extractor.compute(image, kps)
+
+        # if there are no keypoints or descriptors, return an empty tuple
+        if len(kps) == 0:
+            return ([], None)
+
+        # apply the Hellinger kernel by first L1-normalizing and taking the
+        # square-root
+        descs /= (descs.sum(axis=1, keepdims=True) + eps)
+        descs = np.sqrt(descs)
+
+        # return a tuple of the keypoints and descriptors
+        return (kps, descs)
+
 FEATURES = {
     "fast": cv2.FastFeatureDetector_create(threshold=30),
     "orb": cv2.ORB_create(nfeatures=6000),
-    #  "sift": cv2.SIFT(),
+    "rootsift": RootSIFT(),
     #  "sift-noscale": cv2.SIFT(nOctaveLayers=1),
 }
 DIM = {

@@ -58,22 +58,29 @@ class R2D2(BaseModel):
             max_scale = self.config["max_scale"],
             min_size  = self.config["min_size"],
             max_size  = self.config["max_size"])
-        if "threshold" in self.config:
-            # Get points above a threshold, unless there are too many points
-            N = len(scores > self.config["threshold"])
-            if N > self.config["max_keypoints"]:
-                idxs = scores.argsort()[-self.config["max_keypoints"] or None:]
+        if XYS is not None:
+            if "threshold" in self.config:
+                # Get points above a threshold, unless there are too many points
+                N = len(scores > self.config["threshold"])
+                if N > self.config["max_keypoints"]:
+                    idxs = scores.argsort()[-self.config["max_keypoints"] or None:]
+                else:
+                    idxs = scores.argsort()[-N or None:]
             else:
-                idxs = scores.argsort()[-N or None:]
-        else:
-            # Always get max number of points, like in the original code
-            idxs = scores.argsort()[-self.config["max_keypoints"] or None:]
+                # Always get max number of points, like in the original code
+                idxs = scores.argsort()[-self.config["max_keypoints"] or None:]
 
-        return {
-            'keypoints': [XYS[idxs, :2]],
-            'scores': [scores[idxs]],
-            'descriptors': [desc[idxs, :].T],
-        }
+            return {
+                'keypoints': [XYS[idxs, :2]],
+                'scores': [scores[idxs]],
+                'descriptors': [desc[idxs, :].T],
+            }
+        else:
+            return {
+                'keypoints': [torch.empty((0, 2))],
+                'scores': [torch.empty((0))],
+                'descriptors': [torch.empty((128, 0))],
+            }
 
     def to(self, device):
         self.selector = self.selector.to(device)
@@ -139,6 +146,9 @@ def extract_multiscale( net, detector, img, selector, scale_f=2**0.25,
     # restore value
     torch.backends.cudnn.benchmark = old_bm
 
+    N = sum([x.shape[0] for x in X])
+    if N == 0:
+        return None, None, None
     Y = torch.cat(Y)
     X = torch.cat(X)
     S = torch.cat(S) # scale

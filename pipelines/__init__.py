@@ -19,10 +19,10 @@ PIPELINES = {
     "alamo": sfm.create_test("alamo"),
     "toweroflondon": sfm.create_test("toweroflondon"),
     "romanforum": sfm.create_test("romanforum"),
-    "aachen": aachen,
-    "4Seasons": FourSeasons,
-    "RobotCar": RobotCar,
-    "inloc": inloc,
+    "aachen": aachen.run_test,
+    "4Seasons": FourSeasons.run_test,
+    "RobotCar": RobotCar.run_test,
+    "inloc": inloc.run_test,
 }
 
 METHODS = [
@@ -37,7 +37,7 @@ METHODS = [
             'max_keypoints': 4096,
             'allow_scale_in_desc': False
         },
-        'matcher_name': "NN",
+        'matcher_name': "L2",
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
@@ -49,7 +49,8 @@ METHODS = [
             'name': 'cvdetectors',
             'cvdetector_name': 'sift',
             'cvdescriptor_name': 'sift',
-            'allow_scale_in_desc': False
+            'allow_scale_in_desc': False,
+            'max_keypoints': 4096,
         },
         'matcher_name': "NN",
         'preprocessing': {
@@ -63,6 +64,7 @@ METHODS = [
             'name': 'cvdetectors',
             'cvdetector_name': 'sift',
             'cvdescriptor_name': 'brief',
+            'max_keypoints': 4096,
         },
         'matcher_name': "HAMMING",
         'preprocessing': {
@@ -78,13 +80,14 @@ METHODS = [
             'descriptor': 'cvdetectors',
             'cvdetector_name': 'fast',
             'cvdescriptor_name': 'brief',
+            'max_keypoints': 4096,
             #  "threshold": 0.01,
         },
         'matcher_name': "HAMMING",
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
+            #  'resize_force': True,
         },
     },
     {
@@ -101,7 +104,7 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
+            #  'resize_force': True,
         },
     },
     {
@@ -117,7 +120,7 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
+            #  'resize_force': True,
         },
     },
     {
@@ -148,17 +151,31 @@ METHODS = [
         },
     },
     {
-        "name": "sift",
+        "name": "rootsift",
         'model': {
             'name': 'cvdetectors',
             'cvdetector_name': 'sift',
-            'cvdescriptor_name': 'sift',
+            'cvdescriptor_name': 'rootsift',
+            'max_keypoints': 4096,
         },
         'matcher_name': "L2",
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
+        },
+    },
+    {
+        "name": "sift",
+        'model': {
+            'name': 'cvdetectors',
+            'cvdetector_name': 'sift',
+            'cvdescriptor_name': 'sift',
+            'max_keypoints': 4096,
+        },
+        'matcher_name': "L2",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
         },
     },
     {
@@ -198,7 +215,6 @@ METHODS = [
         'preprocessing': {
             'grayscale': False,
             'resize_max': 1600,
-            'resize_force': True,
         },
     },
     {
@@ -214,7 +230,6 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
         },
     },
     {
@@ -231,7 +246,6 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
         },
     },
     {
@@ -247,7 +261,6 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
         },
     },
     {
@@ -263,7 +276,6 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
         },
     },
     {
@@ -278,7 +290,6 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
         },
     },
     {
@@ -293,7 +304,75 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
+        },
+    },
+    {
+        'name': 'miniunet+brief',
+        'model': {
+            'name': 'split',
+            'detector': 'cpainted',
+            'descriptor': 'cvdetectors',
+            'cvdetector_name': 'fast',
+            'cvdescriptor_name': 'brief',
+            'model': 'miniunet',
+            'checkpoint': 'miniunet1.pth',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+            'superpoint_desc': False,
+            "subpixel": True,
+        },
+        'matcher_name': "L2",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+        },
+    },
+    {
+        'name': 'miniunet+hardnet',
+        'model': {
+            'name': 'split',
+            'detector': 'cpainted',
+            'descriptor': 'hardnet',
+            'checkpoint': 'miniunet1.pth',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+            'superpoint_desc': False,
+            "subpixel": True,
+        },
+        'matcher_name': "L2",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+        },
+    },
+    {
+        'name': 'miniunet+superpoint',
+        'model': {
+            'name': 'cpainted',
+            'checkpoint': 'miniunet1.pth',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+            "subpixel": True,
+        },
+        'matcher_name': "L2",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
+        },
+    },
+    {
+        'name': 'miniunet+superpoint+superglue',
+        'model': {
+            'name': 'cpainted',
+            'checkpoint': 'miniunet1.pth',
+            'nms_radius': 3,
+            'max_keypoints': 4096,
+            "subpixel": False,
+        },
+        'matcher_name': "superglue",
+        'preprocessing': {
+            'grayscale': True,
+            'resize_max': 1600,
         },
     },
     {
@@ -307,7 +386,6 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
         },
     },
     {
@@ -321,7 +399,6 @@ METHODS = [
         'preprocessing': {
             'grayscale': True,
             'resize_max': 1600,
-            'resize_force': True,
         },
     },
 ]
@@ -353,7 +430,7 @@ def run_pipeline(base_dir, output_dir, pipeline_name, config, run_localization, 
     # Run pipeline
     matcher_conf = MATCHER_CONFS[config["matcher_name"]]
     pipeline = PIPELINES[pipeline_name]
-    stats = pipeline.run_test(base_dir, output_dir, config, matcher_conf, run_name, run_localization=run_localization, skip_reconstruction=skip_reconstruction)
+    stats = pipeline(base_dir, output_dir, config, matcher_conf, run_name, run_localization=run_localization, skip_reconstruction=skip_reconstruction)
 
     # Save results
     out_path = gen_out_path(output_dir, pipeline_name) / f"{run_name}.json"
